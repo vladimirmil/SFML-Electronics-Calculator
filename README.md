@@ -1,2 +1,2 @@
-# SFML-CPLUPLUS-APP
+# SFML-CPLUSPLUS-APP
 Yo it's an app
