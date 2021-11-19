@@ -1,5 +1,5 @@
-#ifndef TEST_CLASS_H
-#define TEST_CLASS_H
+#ifndef TEST_MENU_H
+#define TEST_MENU_H
 
 #include "State.h"
 #include "MainMenu.h"
