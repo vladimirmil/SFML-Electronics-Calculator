@@ -40,7 +40,8 @@ int HandleInput::index_of_last_character_found(std::string s, char c)
 double HandleInput::set_prefix_values(int prefix)
 {
 	double value = 0;
-	switch (prefix) {
+	switch (prefix) 
+	{
 	case 0:
 		value = 1000000000;
 		break;
@@ -85,7 +86,8 @@ bool HandleInput::decimal_check(std::vector<std::string>& input, std::string s)
 
 	std::replace(s.begin(), s.end(), ',', '.');
 
-	while ((pos = s.find(delimiter)) != std::string::npos) {
+	while ((pos = s.find(delimiter)) != std::string::npos) 
+	{
 		token = s.substr(0, pos);
 		input.push_back(token);
 		s.erase(0, pos + delimiter.length());
@@ -94,9 +96,8 @@ bool HandleInput::decimal_check(std::vector<std::string>& input, std::string s)
 
 	//std::cout << "vector size: " << input.size() << std::endl;
 
-	if (input.size() > 2) {
+	if (input.size() > 2)
 		return false;
-	}
 	return true;
 }
 
@@ -120,12 +121,14 @@ double HandleInput::logic(std::vector<std::string>& list, std::vector<std::strin
 	double result, value = 0;
 	std::string s = "";
 	p = "X";
-
-	if (list.size() == 1) {
-		index = 0;                                  //ako nema, lista se sastoji od 1 �lana
-	}
-	else if (list.size() == 2) {
-		index = 1;                                  //ako ima, lista se sastoji od dva �lana i prefiks se uvek nalazi u drugom
+	// if input does not contain a comma, vector has 1 element
+	if (list.size() == 1) 
+	{
+		index = 0;                                  
+	}// if input does contain a comma, vector has 2 elements and prefix is at second
+	else if (list.size() == 2) 
+	{
+		index = 1;                                  
 	}
 	else
 	{
@@ -134,33 +137,37 @@ double HandleInput::logic(std::vector<std::string>& list, std::vector<std::strin
 		return -1;
 	}
 
-	//pro�i kroz listu prefiksa i prona�i koji se nalazi u listi unosa
-	for (unsigned int x = 0; x < prefix.size(); x++) {
-		if (this->string_contains(list[index], prefix[x])) {
-			p = prefix[x];                          //podesi se prefix npr p = "M"
-			prefixInt = x;                          //ovo je za switch u set_values(), pamti se na kojem se indeksu
-			break;                                  //nalazi prona�eni prefiks jer c++ nema switch za stringove
+	// go through prefix vector and find which one does input vector contain
+	for (unsigned int x = 0; x < prefix.size(); x++) 
+	{
+		if (this->string_contains(list[index], prefix[x])) 
+		{
+			p = prefix[x];                          // p = "M"
+			prefixInt = x;                          // saves which index it is on, used in switch later on
+			break;
 		}
 	}
-
-	for (unsigned int i = 0; i < list.size(); i++)	// spajanje vektora u string
+	// merge vector elements into a string
+	for (unsigned int i = 0; i < list.size(); i++)
 	{
 		if (i == 1)
 			s.append(".");
 		s.append(list[i]);
 	}
-
+	// prefix is located at the end so it is replaced with blank space, example: 0.1u -> 0.1
 	if (index == 1)
-	{
-		this->replaceAll(s, p, "");                            //prefiks se nalazi na kraju pa se zamenjuje sa "" npr 0.1u -> 0.1
+	{ 
+		this->replaceAll(s, p, "");
 		std::replace(s.begin(), s.end(), ',', '.');
 	}
 	else if (index == 0)
 	{
-		this->replaceAll(s, p, ".");							//prefiks se nalazi u sredini pa se zamenjuje sa "." npr 4K7 -> 4.7
-
-		int num_of_dots = this->char_count(s, '.');             //ako je unos "1ppp" tada je s="1..."
-		for (int x = 1; x < num_of_dots; x++) {			 //petlja brise sve tacke sem prve npr: 4KKKK7 -> 4....7 -> 4.7
+		// prefix is located int the middle so it is replaced with a dot, example 4K7 -> 4.7
+		this->replaceAll(s, p, ".");
+		int num_of_dots = this->char_count(s, '.');             // if input is "1ppp" then s="1..."
+		for (int x = 1; x < num_of_dots; x++) 
+		{
+			// deleting every dot except for the first one, example: 4KKKKKKKK7 -> 4.7
 			int index = this->index_of_last_character_found(s, '.');
 			s.erase(s.begin() + index);
 		}
@@ -172,7 +179,7 @@ double HandleInput::logic(std::vector<std::string>& list, std::vector<std::strin
 		return -1;
 	}
 
-	//pretvaranje u double
+	// string to double
 	try
 	{
 		std::size_t pos;
@@ -195,9 +202,8 @@ double HandleInput::logic(std::vector<std::string>& list, std::vector<std::strin
 
 	if (!this->error)
 	{
-		value = this->set_prefix_values(prefixInt);			//zamena prefiksa sa broj�anom vredno��u K -> 1000
-		result = result * value;				//kona�an rezultat 4.7 * 1000 -> 4700
-		//std::cout << "Result:" << result << std::endl;
+		value = this->set_prefix_values(prefixInt);			// K -> 1000
+		result = result * value;							//4.7 * 1000 -> 4700
 		return result;
 	}
 
