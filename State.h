@@ -6,10 +6,10 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 #include <stack>
-
-#include "Button.h"
-#include "TextBox.h"
-#include "Label.h"
+#include "Gui.h"
+#include "Footer.h"
+#include "Titlebar.h"
+#include "HandleInput.h"
 
 class State
 {
@@ -36,6 +36,8 @@ public:
 	virtual void updateMousePositions();
 
 	virtual void endState() = 0;
+	virtual void updateInput() = 0;
+	virtual void updateMouseMov() = 0;
 	virtual void update(/*const float& dt*/) = 0;
 	virtual void render(sf::RenderTarget* target = nullptr) = 0;
 };

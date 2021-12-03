@@ -7,7 +7,10 @@ MainMenu::MainMenu(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* 
 	{
 		this->states->back()->endState();
 	}
-	
+
+	this->background.setSize(sf::Vector2f((float)window->getSize().x, (float)window->getSize().y));
+	this->background.setFillColor(sf::Color(37, 37, 37, 255));
+
 	this->initGUI();
 	std::cout << "Constuctor: MainMenu" << std::endl;	
 }
@@ -21,92 +24,57 @@ MainMenu::~MainMenu()
 		delete i->second;
 	}
 
-	for (auto i = this->textboxes.begin(); i != this->textboxes.end(); i++)
-	{
-		std::cout << "Delete: TextBox" << std::endl;
-		delete i->second;
-	}
-
 	for (auto i = this->labels.begin(); i != this->labels.end(); i++)
 	{
 		std::cout << "Delete: Label" << std::endl;
 		delete i->second;
 	}
-}
-
-void MainMenu::initGUI()
-{
-	this->buttons["BUTTON_1"] = new Button(100.f, 100.f, 100.f, 30.f, &this->font, "page 2",
-		BLUE_IDLE, BLUE_HOVER, BLUE_PRESSED, sf::Color::Color(34, 30, 31, 255), 2.f);
-		//YELLOW_IDLE, YELLOW_HOVER, YELLOW_PRESSED, sf::Color::Color(34, 30, 31, 255), 2.f);
-	
-	this->buttons["BUTTON_2"] = new Button(100.f, 150.f, 100.f, 30.f, &this->font, "button 2",
-		BLUE_IDLE, BLUE_HOVER, BLUE_PRESSED, sf::Color::Color(34, 30, 31, 255), 2.f);
-		//YELLOW_IDLE, YELLOW_HOVER, YELLOW_PRESSED, sf::Color::Color(34, 30, 31, 255), 2.f);
-	this->buttons["BUTTON_3"] = new Button(100.f, 200.f, 100.f, 30.f, &this->font, "button 3",
-		BLUE_IDLE, BLUE_HOVER, BLUE_PRESSED, sf::Color::Color(34, 30, 31, 255), 2.f);
-		//YELLOW_IDLE, YELLOW_HOVER, YELLOW_PRESSED, sf::Color::Color(34, 30, 31, 255), 2.f);
-
-	this->textboxes["textbox1"] = new TextBox(100.f, 250.f, &this->font, "textbox1");
-	this->textboxes["textbox2"] = new TextBox(100.f, 290.f, &this->font, "textbox2");
-	this->textboxes["textbox3"] = new TextBox(100.f, 330.f, &this->font, "textbox3");
-
-	this->labels["label1"] = new Label(50.f, 255.f, &this->font, "Label1", 12, sf::Color::White);
-	this->labels["label2"] = new Label(50.f, 295.f, &this->font, "Label2", 12, sf::Color::White);
-	this->labels["label3"] = new Label(50.f, 335.f, &this->font, "Label3", 12, sf::Color::White);
-}
-
-void MainMenu::updateGUI()
-{
-	for (auto &i : this->buttons)
-	{
-		i.second->update(this->mousePositionView);
-	}
-	for (auto &i : this->textboxes)
-	{
-		i.second->update(this->mousePositionView, this->ev);
-	}
-
-	if (buttons["BUTTON_1"]->isPressed())
-	{
-		std::cout << "Button 1: pressed" << std::endl;
-		this->states->push_front(new TestMenu(this->window, ev, states));
-	}
-		
-	if (buttons["BUTTON_2"]->isPressed())
-	{
-		std::cout << "Button 2: pressed" << std::endl;
-	}
-		
-	if (buttons["BUTTON_3"]->isPressed())
-	{
-		std::cout << "Button 3: pressed" << std::endl;
-	}
-		
-}
-
-void MainMenu::renderGUI(sf::RenderTarget * target)
-{
-	for (auto &i : this->buttons)
-	{
-		i.second->render(target);
-	}
-
-	for (auto &i : this->textboxes)
-	{
-		i.second->render(target);
-	}
-	for (auto &i : this->labels)
-	{
-		i.second->render(target);
-	}
-	
+	delete this->footer;
 }
 
 void MainMenu::endState()
 {
 	std::cout << "Ending state: MainMenu" << std::endl;
 	this->quit = true;
+}
+
+void MainMenu::initGUI()
+{
+	this->titlebar = new Titlebar(this->window, &this->font, "Main menu");
+	this->footer = new Footer(this->window, &this->font);
+
+	this->buttons["BUTTON_PAGE1"] = new gui::Button(60.f, 100.f, "Images/page1ButtonIdle.png", "Images/page1ButtonHover.png", "Images/page1ButtonPressed.png");
+	this->buttons["BUTTON_PAGE2"] = new gui::Button(320.f, 100.f, "Images/page2ButtonIdle.png", "Images/page2ButtonHover.png", "Images/page2ButtonPressed.png");
+	this->buttons["BUTTON_PAGE3"] = new gui::Button(580.f, 100.f, "Images/page3ButtonIdle.png", "Images/page3ButtonHover.png", "Images/page3ButtonPressed.png");
+	this->buttons["BUTTON_PAGE4"] = new gui::Button(840.f, 100.f, "Images/page4ButtonIdle.png", "Images/page4ButtonHover.png", "Images/page4ButtonPressed.png");
+}
+
+void MainMenu::updateGUI()
+{
+	this->titlebar->update(this->mousePositionView, this->window);
+
+	for (auto &i : this->buttons)
+	{
+		i.second->update(this->mousePositionView);
+	}
+
+	if (buttons["BUTTON_PAGE1"]->isPressed())
+		this->states->push_front(new PageOne(this->window, ev, states));
+	if (buttons["BUTTON_PAGE2"]->isPressed())
+		this->states->push_front(new PageTwo(this->window, ev, states));
+	if (buttons["BUTTON_PAGE3"]->isPressed())
+		this->states->push_front(new PageThree(this->window, ev, states));
+	if (buttons["BUTTON_PAGE4"]->isPressed())
+		this->states->push_front(new PageFour(this->window, ev, states));	
+}
+
+void MainMenu::updateInput()
+{
+}
+
+void MainMenu::updateMouseMov()
+{
+	this->titlebar->updateWindowPosition(this->window);
 }
 
 void MainMenu::update(/*const float& dt*/)
@@ -116,14 +84,27 @@ void MainMenu::update(/*const float& dt*/)
 	this->updateGUI(/*dt*/);
 }
 
+void MainMenu::renderGUI(sf::RenderTarget * target)
+{
+	this->titlebar->render(target);
+	this->footer->render(target);
+
+	for (auto &i : this->buttons)
+	{
+		i.second->render(target);
+	}
+
+	for (auto &i : this->labels)
+	{
+		i.second->render(target);
+	}
+}
+
 void MainMenu::render(sf::RenderTarget * target)
 {
 	if (!target)
 		target = this->window;
-	//target->clear(sf::Color(39, 34, 36, 255));
-	target->clear(sf::Color(35, 31, 32, 255));
-
-	//target->draw(this->background);
+	target->clear();
+	target->draw(this->background);
 	this->renderGUI(target);
-	//this->window->clear(sf::Color(10, 20, 30, 255));
 }

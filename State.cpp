@@ -27,7 +27,7 @@ void State::setQuit(bool quit)
 
 void State::initFonts()
 {
-	if (!this->font.loadFromFile("Fonts/arial.ttf"))
+	if (!this->font.loadFromFile("Fonts/Roboto-Regular.ttf"))
 	{
 		throw("ERROR: Coudld not load font");
 	}

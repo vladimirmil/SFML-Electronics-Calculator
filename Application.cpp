@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "MainMenu.h"
-#include "TestMenu.h"
 
 void Application::initVariables()
 {
@@ -11,9 +10,10 @@ void Application::initWindow()
 {
 	this->videoMode.height = WINDOW_HEIGHT;
 	this->videoMode.width = WINDOW_WIDTH;
-	this->window = new sf::RenderWindow(this->videoMode, "title", sf::Style::Default);
+	this->window = new sf::RenderWindow(this->videoMode, "title", sf::Style::None);
 	this->window->setKeyRepeatEnabled(false);
 	this->window->setFramerateLimit(FRAMERATE_LIMIT);
+	this->window->setVerticalSyncEnabled(true);
 }
 
 void Application::initStates()
@@ -47,14 +47,29 @@ const bool Application::isRunning() const
 
 void Application::pollEvents()
 {
-	
 	while (this->window->pollEvent(this->ev))
 	{
-		
 		switch (this->ev.type)
 		{
-		/*
+		
 		case sf::Event::TextEntered:
+			if (!this->states.empty())
+				this->states.front()->updateInput();
+			break;
+		case sf::Event::MouseButtonPressed:
+			if (!this->states.empty())
+				this->states.front()->updateInput();
+			break;
+		case sf::Event::MouseMoved:
+			if (!this->states.empty())
+				this->states.front()->updateMouseMov();
+			break;
+		/*
+		case sf::Event::MouseButtonReleased:
+			
+			if (ev.mouseButton.button == sf::Mouse::Left)
+				std::cout << "Mouse released" << std::endl;
+			
 			break;
 		*/
 		case sf::Event::Closed:
@@ -95,7 +110,7 @@ void Application::update(/*const float& dt*/)
 
 void Application::render()
 {
-	this->window->clear(sf::Color(255, 255, 255, 255));
+	this->window->clear();
 
 	if (!this->states.empty())
 		this->states.front()->render(this->window);

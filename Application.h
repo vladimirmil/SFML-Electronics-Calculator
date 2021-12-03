@@ -3,9 +3,9 @@
 
 #include "State.h"
 
-constexpr auto WINDOW_WIDTH = 1020;
-constexpr auto WINDOW_HEIGHT = 620;
-constexpr auto FRAMERATE_LIMIT = 30;
+constexpr auto WINDOW_WIDTH = 1100;
+constexpr auto WINDOW_HEIGHT = 640;
+constexpr auto FRAMERATE_LIMIT = 60;
 
 class Application
 {
