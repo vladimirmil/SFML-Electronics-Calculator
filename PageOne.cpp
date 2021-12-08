@@ -6,56 +6,67 @@ void PageOne::initBackground(sf::RenderWindow* window)
 	this->background.setFillColor(sf::Color(37, 37, 37, 255));
 }
 
+void PageOne::initPopUpText()
+{
+	this->popup1text.append("Non-inv op-amp with non-inv reference\n\n");
+	this->popup1text.append("This circuit can be used to translate\na sensor output voltage with a positive\n");
+	this->popup1text.append("slope and negative offset to a usable\nADC input voltage range.\n\n");
+	this->popup1text.append("Valid prefixes: G, M, K, m, u, n, p");
+
+	this->popup2text.append("   Non-inv op-amp with inv reference\n\n");						
+	this->popup2text.append("This circuit can be used to translate\na sensor output voltage with a positive\n");
+	this->popup2text.append("slope and positive offset to a usable\nADC input voltage range.\n\n");
+	this->popup2text.append("Valid prefixes: G, M, K, m, u, n, p");
+		
+	this->popup3text.append("   Inv op-amp with non-inv reference\n\n");
+	this->popup3text.append("This circuit can be used to translate\na sensor output voltage with a positive\n");
+	this->popup3text.append("slope and negative offset to a usable\nADC input voltage range.\n\n");
+	this->popup3text.append("Valid prefixes: G, M, K, m, u, n, p");
+	
+	this->popup4text.append("      Inv op-amp with inv reference\n\n");
+	this->popup4text.append("This circuit can be used to translate\na negative sensor output voltage to a\n");
+	this->popup4text.append("usable ADC input voltage range.\n\n\n");
+	this->popup4text.append("Valid prefixes: G, M, K, m, u, n, p");
+}
+
 PageOne::PageOne(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states) : State(window, ev, states)
 {
 	if (!this->states->empty())
 		this->states->back()->endState();
-	
+
 	this->calculateState = this->CALC_STATE_0;
+	this->initPopUpText();
 	this->initBackground(window);
 	this->initGUI();
-	std::cout << "Constuctor: MainMenu" << std::endl;
 }
 
 PageOne::~PageOne()
 {
-	std::cout << "Deconstuctor: MainMenu" << std::endl;
 	for (auto i = this->buttons.begin(); i != this->buttons.end(); i++)
-	{
-		std::cout << "Delete: Button" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->textboxes.begin(); i != this->textboxes.end(); i++)
-	{
-		std::cout << "Delete: TextBox" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->labels.begin(); i != this->labels.end(); i++)
-	{
-		std::cout << "Delete: Label" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->images.begin(); i != this->images.end(); i++)
-	{
-		std::cout << "Delete: Image" << std::endl;
 		delete i->second;
-	}
+
+	for (auto i = this->popups.begin(); i != this->popups.end(); i++)
+		delete i->second;
 
 	delete this->titlebar;
 	delete this->footer;
 }
 
-void PageOne::calculate()
+void PageOne::calculate(calculate_state calculateState)
 {
 	double r1, r2, r3, r4, vimin, vimax, vomin, vomax, vr, gain = 0;
 
-	switch (this->calculateState)
+	switch (calculateState)
 	{
-	case this->CALC_STATE_0:
-		break;
 	case this->CALC_STATE_1:
 
 		vimin = handleinput.getDouble(this->textboxes["TEXTBOX_1_VIMIN"]->getText());
@@ -69,7 +80,8 @@ void PageOne::calculate()
 
 		// gain = (vomax - vomin) / (vimax - vimin)
 		try { gain = handleinput.divisionException((vomax - vomin), (vimax - vimin)); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			gain = -1;
 			std::cerr << e.what() << std::endl;
 		}
@@ -82,13 +94,15 @@ void PageOne::calculate()
 		{
 			// r2 = (-1000 * vr) / (vimin * gain + vr - vr * gain - vomin)
 			try { r2 = handleinput.divisionException((-1000 * vr), (vimin * gain + vr - vr * gain - vomin)); }
-			catch (std::invalid_argument &e) {
+			catch (std::invalid_argument &e) 
+			{
 				r2 = -1;
 				std::cerr << e.what() << std::endl;
 			}
 			// r3 = ((1000000 + (1000 * r2)) / (gain * r2)) - 1000;
 			try { r3 = handleinput.divisionException((1000000 + (1000 * r2)), (gain * r2));  r3 = r3 - 1000; }
-			catch (std::invalid_argument &e) {
+			catch (std::invalid_argument &e) 
+			{
 				r3 = -1;
 				std::cerr << e.what() << std::endl;
 			}
@@ -98,8 +112,6 @@ void PageOne::calculate()
 		textboxes["TEXTBOX_1_R2"]->setText(handleinput.toString(r2));
 		textboxes["TEXTBOX_1_R3"]->setText(handleinput.toString(r3));
 		textboxes["TEXTBOX_1_R4"]->setText(handleinput.toString(r4));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
 
 	case this->CALC_STATE_2:
@@ -114,7 +126,8 @@ void PageOne::calculate()
 		r4 = 1000;
 		// gain = (vomax - vomin) / (vimax - vimin)
 		try { gain = handleinput.divisionException((vomax - vomin), (vimax - vimin)); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			gain = -1;
 			std::cerr << e.what() << std::endl;
 		}
@@ -127,13 +140,15 @@ void PageOne::calculate()
 		{
 			// r2 = (-vr * 1000) / (vomin - (vimin * gain))
 			try { r2 = handleinput.divisionException((-vr * 1000), (vomin - (vimin * gain))); }
-			catch (std::invalid_argument &e) {
+			catch (std::invalid_argument &e) 
+			{
 				r2 = -1;
 				std::cerr << e.what() << std::endl;
 			}
 			// r3 = ( (1000000 + (1000 * r2)) / (gain * r2) ) - 1000
 			try { r3 = handleinput.divisionException((1000000 + (1000 * r2)), (gain * r2));  r3 = r3 - 1000; }
-			catch (std::invalid_argument &e) {
+			catch (std::invalid_argument &e) 
+			{
 				r3 = -1;
 				std::cerr << e.what() << std::endl;
 			}
@@ -143,9 +158,8 @@ void PageOne::calculate()
 		textboxes["TEXTBOX_2_R2"]->setText(handleinput.toString(r2));
 		textboxes["TEXTBOX_2_R3"]->setText(handleinput.toString(r3));
 		textboxes["TEXTBOX_2_R4"]->setText(handleinput.toString(r4));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
+
 	case this->CALC_STATE_3:
 
 
@@ -157,29 +171,31 @@ void PageOne::calculate()
 
 		// gain = (vomax - vomin) / (vimax - vimin)
 		try { gain = handleinput.divisionException((vomax - vomin), (vimax - vimin)); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			gain = -1;
 			std::cerr << e.what() << std::endl;
 		}
 		r1 = gain * r2;
 		// r4 = k (temp var)
 		try { r4 = handleinput.divisionException(r1, r2); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e)
+		{
 			r4 = -1;
 			std::cerr << e.what() << std::endl;
 		}
 		// vr = ((vimax * k) + vomin) / (1 + k)
 		try { vr = handleinput.divisionException(((vimax * r4) + vomin), (1 + r4)); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			vr = -1;
 			std::cerr << e.what() << std::endl;
 		}
 
 		textboxes["TEXTBOX_3_R1"]->setText(handleinput.toString(r1));
 		textboxes["TEXTBOX_3_VR"]->setText(handleinput.toString(vr));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
+
 	case this->CALC_STATE_4:
 
 		vimin = handleinput.getDouble(this->textboxes["TEXTBOX_4_VIMIN"]->getText());
@@ -193,34 +209,37 @@ void PageOne::calculate()
 		r4 = 0; 
 		// gain = (vomax - vomin) / (vimax - vimin)
 		try { gain = handleinput.divisionException((vomax - vomin), (vimax - vimin)); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			gain = -1;
 			std::cerr << e.what() << std::endl;
 		}
 		// r2 = r1 / gain
 		try { r2 = handleinput.divisionException(r1, gain); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			r2 = -1;
 			std::cerr << e.what() << std::endl;
 		}
 		// k = (omin + imax * gain) / (-vref)
 		try { r4 = handleinput.divisionException((vomin + vimax * gain), (-vr)); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			r4 = -1;
 			std::cerr << e.what() << std::endl;
 		}
 		// r3 = r1 / k
 		try { r3 = handleinput.divisionException(r1, r4); }
-		catch (std::invalid_argument &e) {
+		catch (std::invalid_argument &e) 
+		{
 			r3 = -1;
 			std::cerr << e.what() << std::endl;
 		}
 		
 		textboxes["TEXTBOX_4_R2"]->setText(handleinput.toString(r2));
 		textboxes["TEXTBOX_4_R3"]->setText(handleinput.toString(r3));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
+
 	default:
 		break;
 	}
@@ -229,7 +248,6 @@ void PageOne::calculate()
 
 void PageOne::endState()
 {
-	std::cout << "Ending state: MainMenu" << std::endl;
 	this->quit = true;
 }
 
@@ -240,10 +258,16 @@ void PageOne::initGUI()
 
 	this->buttons["BUTTON_BACK"] = new gui::Button(22.f, 45.f, "Back", &this->font);
 
+	this->popups["POPUP_1"] = new gui::PopUp(&this->font, this->popup1text, 20.f, 150.f);
+	this->popups["POPUP_2"] = new gui::PopUp(&this->font, this->popup2text, 300.f, 150.f);
+	this->popups["POPUP_3"] = new gui::PopUp(&this->font, this->popup3text, 580.f, 150.f);
+	this->popups["POPUP_4"] = new gui::PopUp(&this->font, this->popup4text, 850.f, 150.f);
+
 	// SECTION 1  ////////////////////////////////////////////////////////////////////////////////////////////////
 	this->images["Image1"] = new gui::Image("Images/Page1Img1.png", 22.5f, 85.f);
 
 	this->buttons["BUTTON_CALC_1"] = new gui::Button(62.f, 470.f, "Calculate", &this->font);
+	this->buttons["BUTTON_HELP_1"] = new gui::Button(162.f, 470.f, 25.f, 25.f, "?", &this->font);
 
 	this->textboxes["TEXTBOX_1_VIMIN"] = new gui::TextBox(62.f, 365.f, &this->font, true);
 	this->textboxes["TEXTBOX_1_VIMAX"] = new gui::TextBox(151.f, 365.f, &this->font, true);
@@ -255,8 +279,8 @@ void PageOne::initGUI()
 	this->textboxes["TEXTBOX_1_R3"] = new gui::TextBox(62.f, 555.f, &this->font, false);
 	this->textboxes["TEXTBOX_1_R4"] = new gui::TextBox(62.f, 580.f, &this->font, false);
 
-	this->labels["LABEL_1_MIN"] = new gui::Label(87.f, 340.f, &this->font, "min", 12, sf::Color::White);
-	this->labels["LABEL_1_MAX"] = new gui::Label(182.f, 340.f, &this->font, "max", 12, sf::Color::White);
+	this->labels["LABEL_1_MIN"] = new gui::Label(88.f, 345.f, &this->font, "min", 12, sf::Color::White);
+	this->labels["LABEL_1_MAX"] = new gui::Label(177.f, 345.f, &this->font, "max", 12, sf::Color::White);
 	this->labels["LABEL_1_VI"] = new gui::Label(40.f, 365.f, &this->font, "Vi", 12, sf::Color::White);
 	this->labels["LABEL_1_VO"] = new gui::Label(40.f, 390.f, &this->font, "Vo", 12, sf::Color::White);
 	this->labels["LABEL_1_VR"] = new gui::Label(40.f, 415.f, &this->font, "Vr", 12, sf::Color::White);
@@ -269,6 +293,7 @@ void PageOne::initGUI()
 	this->images["Image2"] = new gui::Image("Images/Page1Img2.png", 297.5f, 85.f);
 
 	this->buttons["BUTTON_CALC_2"] = new gui::Button(325.f, 470.f, "Calculate", &this->font);
+	this->buttons["BUTTON_HELP_2"] = new gui::Button(425.f, 470.f, 25.f, 25.f, "?", &this->font);
 
 	this->textboxes["TEXTBOX_2_VIMIN"] = new gui::TextBox(325.f, 365.f, &this->font, true);
 	this->textboxes["TEXTBOX_2_VIMAX"] = new gui::TextBox(414.f, 365.f, &this->font, true);
@@ -280,8 +305,8 @@ void PageOne::initGUI()
 	this->textboxes["TEXTBOX_2_R3"] = new gui::TextBox(325.f, 555.f, &this->font, false);
 	this->textboxes["TEXTBOX_2_R4"] = new gui::TextBox(325.f, 580.f, &this->font, false);
 
-	this->labels["LABEL_2_MIN"] = new gui::Label(362.f, 340.f, &this->font, "min", 12, sf::Color::White);
-	this->labels["LABEL_2_MAX"] = new gui::Label(457.f, 340.f, &this->font, "max", 12, sf::Color::White);
+	this->labels["LABEL_2_MIN"] = new gui::Label(351.f, 345.f, &this->font, "min", 12, sf::Color::White);
+	this->labels["LABEL_2_MAX"] = new gui::Label(440.f, 345.f, &this->font, "max", 12, sf::Color::White);
 	this->labels["LABEL_2_VI"] = new gui::Label(303.f, 365.f, &this->font, "Vi", 12, sf::Color::White);
 	this->labels["LABEL_2_VO"] = new gui::Label(303.f, 390.f, &this->font, "Vo", 12, sf::Color::White);
 	this->labels["LABEL_2_VR"] = new gui::Label(303.f, 415.f, &this->font, "Vr", 12, sf::Color::White);
@@ -294,6 +319,7 @@ void PageOne::initGUI()
 	this->images["Image3"] = new gui::Image("Images/Page1Img3.png", 572.5f, 85.f);
 
 	this->buttons["BUTTON_CALC_3"] = new gui::Button(600.f, 470.f, "Calculate", &this->font);
+	this->buttons["BUTTON_HELP_3"] = new gui::Button(700.f, 470.f, 25.f, 25.f, "?", &this->font);
 
 	this->textboxes["TEXTBOX_3_VIMIN"] = new gui::TextBox(600.f, 365.f, &this->font, true);
 	this->textboxes["TEXTBOX_3_VIMAX"] = new gui::TextBox(692.f, 365.f, &this->font, true);
@@ -303,8 +329,8 @@ void PageOne::initGUI()
 	this->textboxes["TEXTBOX_3_VR"] = new gui::TextBox(600.f, 505.f, &this->font, false);
 	this->textboxes["TEXTBOX_3_R1"] = new gui::TextBox(600.f, 530.f, &this->font, false);
 
-	this->labels["LABEL_3_MIN"] = new gui::Label(637.f, 340.f, &this->font, "min", 12, sf::Color::White);
-	this->labels["LABEL_3_MAX"] = new gui::Label(732.f, 340.f, &this->font, "max", 12, sf::Color::White);
+	this->labels["LABEL_3_MIN"] = new gui::Label(626.f, 345.f, &this->font, "min", 12, sf::Color::White);
+	this->labels["LABEL_3_MAX"] = new gui::Label(718.f, 345.f, &this->font, "max", 12, sf::Color::White);
 	this->labels["LABEL_3_VI"] = new gui::Label(578.f, 365.f, &this->font, "Vi", 12, sf::Color::White);
 	this->labels["LABEL_3_VO"] = new gui::Label(578.f, 390.f, &this->font, "Vo", 12, sf::Color::White);
 	this->labels["LABEL_3_VR"] = new gui::Label(578.f, 505.f, &this->font, "Vr", 12, sf::Color::White);
@@ -315,6 +341,7 @@ void PageOne::initGUI()
 	this->images["Image4"] = new gui::Image("Images/Page1Img4.png", 847.5f, 85.f);
 
 	this->buttons["BUTTON_CALC_4"] = new gui::Button(875.f, 470.f, "Calculate", &this->font);
+	this->buttons["BUTTON_HELP_4"] = new gui::Button(975.f, 470.f, 25.f, 25.f, "?", &this->font);
 
 	this->textboxes["TEXTBOX_4_VIMIN"] = new gui::TextBox(875.f, 365.f, &this->font, true);
 	this->textboxes["TEXTBOX_4_VIMAX"] = new gui::TextBox(965.f, 365.f, &this->font, true);
@@ -325,8 +352,8 @@ void PageOne::initGUI()
 	this->textboxes["TEXTBOX_4_R2"] = new gui::TextBox(875.f, 505.f, &this->font, false);
 	this->textboxes["TEXTBOX_4_R3"] = new gui::TextBox(875.f, 530.f, &this->font, false);
 
-	this->labels["LABEL_4_MIN"] = new gui::Label(912.f, 340.f, &this->font, "min", 12, sf::Color::White);
-	this->labels["LABEL_4_MAX"] = new gui::Label(980.f, 340.f, &this->font, "max", 12, sf::Color::White);
+	this->labels["LABEL_4_MIN"] = new gui::Label(901.f, 345.f, &this->font, "min", 12, sf::Color::White);
+	this->labels["LABEL_4_MAX"] = new gui::Label(991.f, 345.f, &this->font, "max", 12, sf::Color::White);
 	this->labels["LABEL_4_VI"] = new gui::Label(853.f, 365.f, &this->font, "Vi", 12, sf::Color::White);
 	this->labels["LABEL_4_VO"] = new gui::Label(853.f, 390.f, &this->font, "Vo", 12, sf::Color::White);
 	this->labels["LABEL_4_VR"] = new gui::Label(853.f, 415.f, &this->font, "Vr", 12, sf::Color::White);
@@ -341,46 +368,51 @@ void PageOne::updateGUI()
 	this->titlebar->update(this->mousePositionView, this->window);
 
 	for (auto &i : this->buttons)
-	{
 		i.second->update(this->mousePositionView);
-	}
-	for (auto &i : this->textboxes)
-	{
-		i.second->update(this->mousePositionView);
-	}
 
-	if (buttons["BUTTON_BACK"]->isPressed())
+	for (auto &i : this->textboxes)
+		i.second->update(this->mousePositionView);
+
+	for (auto &i : this->popups)
+		i.second->update(this->mousePositionView);
+
+	if (buttons["BUTTON_BACK"]->isReleased())
 		this->states->push_front(new MainMenu(this->window, ev, states));
 
-	if (buttons["BUTTON_CALC_1"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_1;
-		this->calculate();
-	}
-	if (buttons["BUTTON_CALC_2"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_2;
-		this->calculate();
-	}
-	if (buttons["BUTTON_CALC_3"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_3;
-		this->calculate();
-	}
-	if (buttons["BUTTON_CALC_4"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_4;
-		this->calculate();
-	}
-	
+	if (buttons["BUTTON_CALC_1"]->isReleased())
+		this->calculate(this->CALC_STATE_1);
+
+	if (buttons["BUTTON_CALC_2"]->isReleased())
+
+		this->calculate(this->CALC_STATE_2);
+
+	if (buttons["BUTTON_CALC_3"]->isReleased())
+
+		this->calculate(this->CALC_STATE_3);
+
+	if (buttons["BUTTON_CALC_4"]->isReleased())
+		this->calculate(this->CALC_STATE_4);
+
+	if (buttons["BUTTON_HELP_1"]->isReleased())
+		this->popups["POPUP_1"]->setVisibility(!this->popups["POPUP_1"]->getVisibility());
+
+	if (buttons["BUTTON_HELP_2"]->isReleased())
+		this->popups["POPUP_2"]->setVisibility(!this->popups["POPUP_2"]->getVisibility());
+
+	if (buttons["BUTTON_HELP_3"]->isReleased())
+		this->popups["POPUP_3"]->setVisibility(!this->popups["POPUP_3"]->getVisibility());
+
+	if (buttons["BUTTON_HELP_4"]->isReleased())
+		this->popups["POPUP_4"]->setVisibility(!this->popups["POPUP_4"]->getVisibility());
 }
 
 void PageOne::updateInput()
 {
 	for (auto &i : this->textboxes)
-	{
 		i.second->updateText(this->ev);
-	}
+
+	for (auto &i : this->buttons)
+		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
 void PageOne::updateMouseMov()
@@ -389,11 +421,11 @@ void PageOne::updateMouseMov()
 }
 
 
-void PageOne::update(/*const float& dt*/)
+void PageOne::update()
 {
 	this->checkQuit();
 	this->updateMousePositions();
-	this->updateGUI(/*dt*/);
+	this->updateGUI();
 }
 
 void PageOne::renderGUI(sf::RenderTarget * target)
@@ -402,33 +434,29 @@ void PageOne::renderGUI(sf::RenderTarget * target)
 	this->footer->render(target);
 
 	for (auto &i : this->buttons)
-	{
 		i.second->render(target);
-	}
 
 	for (auto &i : this->textboxes)
-	{
 		i.second->render(target);
-	}
 
 	for (auto &i : this->labels)
-	{
 		i.second->render(target);
-	}
 
 	for (auto &i : this->images)
-	{
 		i.second->render(target);
-	}
 
-	
+	for (auto &i : this->popups)
+	{
+		if (i.second->getVisibility())
+			i.second->render(target);
+	}
 }
 
 void PageOne::render(sf::RenderTarget * target)
 {
 	if (!target)
 		target = this->window;
-	target->clear(/*sf::Color(37, 37, 37, 255)*/);
+	target->clear();
 	target->draw(this->background);
 	this->renderGUI(target);
 }

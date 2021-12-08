@@ -2,7 +2,6 @@
 
 State::State(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states)
 {
-	std::cout << "Constuctor: State" << std::endl;
 	this->window = window;
 	this->ev = ev;
 	this->quit = false;
@@ -12,7 +11,6 @@ State::State(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states
 
 State::~State()
 {
-	std::cout << "Deconstuctor: State" << std::endl;
 }
 
 const bool & State::getQuit() const
@@ -35,8 +33,6 @@ void State::initFonts()
 
 void State::checkQuit()
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-		this->quit = true;
 }
 
 void State::updateMousePositions()

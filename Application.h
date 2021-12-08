@@ -14,10 +14,8 @@ private:
 	sf::RenderWindow* window;
 	sf::VideoMode videoMode;
 	sf::Event ev;
-	//sf::Clock dtClock;
-	//float dt;
 	std::deque<State*> states;
-
+	bool hasFocus;
 	void initVariables();
 	void initWindow();
 	void initStates();
@@ -29,8 +27,7 @@ public:
 	const bool isRunning() const;
 
 	void pollEvents();
-	//void updateDt();
-	void update(/*const float& dt*/);
+	void update();
 	void render();
 	void run();
 

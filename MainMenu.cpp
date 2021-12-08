@@ -12,29 +12,21 @@ MainMenu::MainMenu(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* 
 	this->background.setFillColor(sf::Color(37, 37, 37, 255));
 
 	this->initGUI();
-	std::cout << "Constuctor: MainMenu" << std::endl;	
 }
 
 MainMenu::~MainMenu()
 {
-	std::cout << "Deconstuctor: MainMenu" << std::endl;
 	for (auto i = this->buttons.begin(); i != this->buttons.end(); i++)
-	{
-		std::cout << "Delete: Button" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->labels.begin(); i != this->labels.end(); i++)
-	{
-		std::cout << "Delete: Label" << std::endl;
 		delete i->second;
-	}
+
 	delete this->footer;
 }
 
 void MainMenu::endState()
 {
-	std::cout << "Ending state: MainMenu" << std::endl;
 	this->quit = true;
 }
 
@@ -54,22 +46,25 @@ void MainMenu::updateGUI()
 	this->titlebar->update(this->mousePositionView, this->window);
 
 	for (auto &i : this->buttons)
-	{
 		i.second->update(this->mousePositionView);
-	}
 
-	if (buttons["BUTTON_PAGE1"]->isPressed())
+	if (buttons["BUTTON_PAGE1"]->isReleased())
 		this->states->push_front(new PageOne(this->window, ev, states));
-	if (buttons["BUTTON_PAGE2"]->isPressed())
+
+	if (buttons["BUTTON_PAGE2"]->isReleased())
 		this->states->push_front(new PageTwo(this->window, ev, states));
-	if (buttons["BUTTON_PAGE3"]->isPressed())
+
+	if (buttons["BUTTON_PAGE3"]->isReleased())
 		this->states->push_front(new PageThree(this->window, ev, states));
-	if (buttons["BUTTON_PAGE4"]->isPressed())
+
+	if (buttons["BUTTON_PAGE4"]->isReleased())
 		this->states->push_front(new PageFour(this->window, ev, states));	
 }
 
 void MainMenu::updateInput()
 {
+	for (auto &i : this->buttons)
+		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
 void MainMenu::updateMouseMov()
@@ -77,11 +72,11 @@ void MainMenu::updateMouseMov()
 	this->titlebar->updateWindowPosition(this->window);
 }
 
-void MainMenu::update(/*const float& dt*/)
+void MainMenu::update()
 {
 	this->checkQuit();
 	this->updateMousePositions();
-	this->updateGUI(/*dt*/);
+	this->updateGUI();
 }
 
 void MainMenu::renderGUI(sf::RenderTarget * target)
@@ -90,14 +85,10 @@ void MainMenu::renderGUI(sf::RenderTarget * target)
 	this->footer->render(target);
 
 	for (auto &i : this->buttons)
-	{
 		i.second->render(target);
-	}
 
 	for (auto &i : this->labels)
-	{
 		i.second->render(target);
-	}
 }
 
 void MainMenu::render(sf::RenderTarget * target)

@@ -11,10 +11,8 @@
 class HandleInput
 {
 private:
-	std::vector<std::string> input_vector;
-	std::vector<std::string> prefix;
-	std::string input;
-	std::string p;
+	std::vector<std::string> input_vector, prefix;
+	std::string input, p;
 	double result;
 	bool error;
 public:

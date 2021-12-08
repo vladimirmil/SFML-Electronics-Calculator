@@ -9,14 +9,17 @@ class PageOne :
 	public State
 {
 private:
+	sf::RectangleShape background;
 	std::map<std::string, gui::Button*> buttons;
 	std::map<std::string, gui::TextBox*> textboxes;
 	std::map<std::string, gui::Label*> labels;
 	std::map<std::string, gui::Image*> images;
+	std::map<std::string, gui::PopUp*> popups;
 	Footer* footer;
 	Titlebar* titlebar;
 	HandleInput handleinput;
-	sf::RectangleShape background;
+
+	std::string popup1text, popup2text, popup3text, popup4text;
 
 	short unsigned calculateState;
 	enum calculate_state{
@@ -28,18 +31,19 @@ private:
 	};
 
 	void initBackground(sf::RenderWindow* window);
+	void initPopUpText();
 public:
 
 	PageOne(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states);
 	virtual ~PageOne();
 
-	void calculate();
+	void calculate(calculate_state calculateState);
 	void endState();
 	void initGUI();
 	void updateGUI();
 	void updateInput();
 	void updateMouseMov();
-	void update(/*const float& dt*/);
+	void update();
 	void renderGUI(sf::RenderTarget * target);
 	void render(sf::RenderTarget* target = nullptr);
 };

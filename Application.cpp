@@ -8,6 +8,7 @@ void Application::initVariables()
 
 void Application::initWindow()
 {
+	this->hasFocus = true;
 	this->videoMode.height = WINDOW_HEIGHT;
 	this->videoMode.width = WINDOW_WIDTH;
 	this->window = new sf::RenderWindow(this->videoMode, "title", sf::Style::None);
@@ -23,7 +24,6 @@ void Application::initStates()
 
 Application::Application()
 {
-	std::cout << "Constuctor: Application" << std::endl;
 	this->initVariables();
 	this->initWindow();
 	this->initStates();
@@ -31,7 +31,6 @@ Application::Application()
 
 Application::~Application()
 {
-	std::cout << "Deconstuctor: Application" << std::endl;
 	while (!this->states.empty())
 	{
 		delete this->states.front();
@@ -51,27 +50,28 @@ void Application::pollEvents()
 	{
 		switch (this->ev.type)
 		{
-		
-		case sf::Event::TextEntered:
-			if (!this->states.empty())
-				this->states.front()->updateInput();
+		case sf::Event::GainedFocus:
+			this->hasFocus = true;
 			break;
-		case sf::Event::MouseButtonPressed:
-			if (!this->states.empty())
+
+		case sf::Event::LostFocus:
+			this->hasFocus = false;
+			break;
+
+		case sf::Event::TextEntered:
+			if (!this->states.empty() && this->hasFocus)
 				this->states.front()->updateInput();
 			break;
 		case sf::Event::MouseMoved:
-			if (!this->states.empty())
+			if (!this->states.empty() && this->hasFocus)
 				this->states.front()->updateMouseMov();
 			break;
-		/*
+		
 		case sf::Event::MouseButtonReleased:
-			
-			if (ev.mouseButton.button == sf::Mouse::Left)
-				std::cout << "Mouse released" << std::endl;
-			
+			if (!this->states.empty() && this->hasFocus)
+				this->states.front()->updateInput();
 			break;
-		*/
+		
 		case sf::Event::Closed:
 			this->window->close();
 			break;
@@ -80,20 +80,16 @@ void Application::pollEvents()
 		}
 	}
 }
-/*
-void Application::updateDt()
-{
-	this->dt = this->dtClock.restart().asSeconds();
-}
-*/
 
-void Application::update(/*const float& dt*/)
+
+void Application::update()
 {
 	this->pollEvents();
 
 	if (!this->states.empty())
 	{
-		this->states.front()->update();
+		if (this->hasFocus)
+			this->states.front()->update();
 
 		if (this->states.back()->getQuit())
 		{
@@ -102,10 +98,9 @@ void Application::update(/*const float& dt*/)
 		}		
 	}
 	else
-	{
-		std::cout << "No more states" << std::endl;
 		this->window->close();
-	}
+		// No more states
+		
 }
 
 void Application::render()
@@ -121,8 +116,7 @@ void Application::run()
 {
 	while (this->isRunning())
 	{
-		//this->updateDt();
-		this->update(/*this->dt*/);
+		this->update();
 		this->render();
 	}
 }

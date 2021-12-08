@@ -6,6 +6,7 @@
 
 void gui::Button::initVariables(sf::Color idleColor, sf::Color hoverColor, sf::Color pressedColor, sf::Color outlineColor, float outlineThickness)
 {
+	this->isButtonReleased = false;
 	this->isImage = false;
 	this->buttonState = this->BUTTON_IDLE;
 	this->outlineColor = outlineColor;
@@ -17,7 +18,6 @@ void gui::Button::initVariables(sf::Color idleColor, sf::Color hoverColor, sf::C
 
 void gui::Button::initShape(float x, float y, float width, float height)
 {
-	//this->isImage = false;
 	this->shape.setPosition(sf::Vector2f(x, y));
 	this->shape.setSize(sf::Vector2f(width, height));
 	this->shape.setFillColor(this->idleColor);
@@ -58,35 +58,23 @@ void gui::Button::initTexture(std::string textureLocationIdle, std::string textu
 
 gui::Button::Button(float x, float y, std::string text, sf::Font * font)
 {
-	this->isImage = false;
-	this->buttonState = this->BUTTON_IDLE;
-	this->outlineColor = sf::Color::Color(40, 40, 40, 255);
-	this->outlineThickness = 1;
-	this->idleColor = sf::Color::Color(45,45,45,255);
-	this->hoverColor = sf::Color::Color(50, 50, 50, 255);
-	this->pressedColor = sf::Color::Color(55, 55, 55, 255);
+	this->initVariables(sf::Color::Color(45, 45, 45, 255), sf::Color::Color(50, 50, 50, 255),
+						sf::Color::Color(55, 55, 55, 255), sf::Color::Color(40, 40, 40, 255), 1.f);
+	this->initShape(x, y, 80.f, 25.f);
+	this->initText(font, text);
+}
 
-	this->shape.setPosition(sf::Vector2f(x, y));
-	this->shape.setSize(sf::Vector2f(80, 25));
-	this->shape.setFillColor(this->idleColor);
-	this->shape.setOutlineColor(this->outlineColor);
-	this->shape.setOutlineThickness(this->outlineThickness);
-
-	this->font = font;
-	this->text.setFont(*this->font);
-	this->text.setString(text);
-	this->text.setFillColor(sf::Color::White);
-	this->text.setCharacterSize(14);
-	this->text.setPosition(
-		this->shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - this->text.getGlobalBounds().width / 2.f,
-		this->shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - this->text.getGlobalBounds().height / 2.f - 3
-	);
+gui::Button::Button(float x, float y, float width, float height, std::string text, sf::Font * font)
+{
+	this->initVariables(sf::Color::Color(45, 45, 45, 255), sf::Color::Color(50, 50, 50, 255),
+						sf::Color::Color(55, 55, 55, 255), sf::Color::Color(40, 40, 40, 255), 1.f);
+	this->initShape(x, y, width, height);
+	this->initText(font, text);
 }
 
 gui::Button::Button(float x, float y, float width, float height, sf::Font * font, std::string text, 
 	sf::Color idleColor, sf::Color hoverColor, sf::Color pressedColor, sf::Color outlineColor, float outlineThickness)
 {
-	this->isImage = false;
 	this->initVariables(idleColor, hoverColor, pressedColor, outlineColor, outlineThickness);
 	this->initShape(x, y, width, height);
 	this->initText(font, text);
@@ -115,17 +103,40 @@ const bool gui::Button::isPressed()
 	return false;
 }
 
-void gui::Button::update(sf::Vector2f mousePosition)
+const bool gui::Button::isReleased()
 {
-	
+	if (this->buttonState == this->BUTTON_RELEASED)
+		return true;
+	return false;
+}
+
+int gui::Button::getButtonState()
+{
+	return this->buttonState;
+}
+
+void gui::Button::updateEvent(sf::Event * ev, sf::Vector2f mousePosition)
+{
+	if (this->shape.getGlobalBounds().contains(mousePosition) && ev->mouseButton.button == sf::Mouse::Left)
+		this->isButtonReleased = true;	
+}
+
+void gui::Button::update(sf::Vector2f mousePosition)
+{	
 	this->buttonState = this->BUTTON_IDLE;
 
 	if (this->shape.getGlobalBounds().contains(mousePosition))
 	{
 		this->buttonState = this->BUTTON_HOVER;
 
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		if (this->shape.getGlobalBounds().contains(mousePosition) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			this->buttonState = this->BUTTON_PRESSED;
+
+		if (this->isButtonReleased)
+		{
+			this->buttonState = this->BUTTON_RELEASED;
+			this->isButtonReleased = false;
+		}	
 	}
 
 	switch (buttonState)
@@ -136,20 +147,26 @@ void gui::Button::update(sf::Vector2f mousePosition)
 		else
 			this->shape.setTexture(&this->textureIdle);
 		break;
+
 	case this->BUTTON_HOVER:
 		if (!this->isImage)
 			this->shape.setFillColor(this->hoverColor);
 		else
 			this->shape.setTexture(&this->textureHover);
 		break;
+
 	case this->BUTTON_PRESSED:
 		if (!this->isImage)
 			this->shape.setFillColor(this->pressedColor);
 		else
 			this->shape.setTexture(&this->texturePressed);
 		break;
+
 	default:
-		this->shape.setFillColor(this->idleColor);
+		if (!this->isImage)
+			this->shape.setFillColor(this->idleColor);
+		else
+			this->shape.setTexture(&this->textureIdle);
 		break;
 	}
 }
@@ -272,14 +289,18 @@ void gui::TextBox::setText(std::string text)
 
 void gui::TextBox::updateCursor()
 {
-	this->cursor.setPosition(sf::Vector2f(this->text.getGlobalBounds().width + this->shape.getPosition().x + 5, this->shape.getPosition().y + 1));
+	this->cursor.setPosition(
+		sf::Vector2f(this->text.getGlobalBounds().width + this->shape.getPosition().x + 5, 
+		this->shape.getPosition().y + 1)
+	);
 }
 
 void gui::TextBox::updateText(sf::Event* ev)
 {
 	if (this->isInput)
 	{
-		if (this->getSelected() && ev->text.unicode < 128 && ev->text.unicode > 2 && text.getGlobalBounds().width < /*this->MAX_TEXT_LENGHT*/this->width - 12 && ev->text.unicode != this->BACKSPACE_KEY
+		if (this->getSelected() && ev->text.unicode < 128 && ev->text.unicode > 2 
+			&& text.getGlobalBounds().width < this->width - 12 && ev->text.unicode != this->BACKSPACE_KEY
 			&& ev->text.unicode != this->ENTER_KEY && ev->text.unicode != this->TAB_KEY)
 		{
 			this->s += static_cast<char>(ev->text.unicode);
@@ -300,8 +321,7 @@ void gui::TextBox::update(sf::Vector2f mousePosition)
 	{
 		this->updateCursor();
 		this->shape.setOutlineThickness(2);
-		this->shape.setOutlineColor(sf::Color::Color(0, 93, 233, 255));	//blue
-		//this->shape.setOutlineColor(sf::Color::Color(250, 175, 0, 255));		//yellow/gold
+		this->shape.setOutlineColor(sf::Color::Color(0, 93, 233, 255));
 	}
 	else
 	{
@@ -498,26 +518,17 @@ gui::Graph::Graph(sf::Font * font, std::string title, std::vector<float> inputVe
 gui::Graph::~Graph()
 {
 	for (unsigned int i = 0; i < this->points.size(); i++)
-	{
-		std::cout << "Delete: Point" << std::endl;
 		delete points[i];
-	}
 
 	for (unsigned int i = 0; i < this->text.size(); i++)
-	{
-		std::cout << "Delete: Text" << std::endl;
 		delete text[i];
-	}
 }
 
 void gui::Graph::clearGraph()
 {
 	for (unsigned int i = 0; i < this->points.size(); i++)
-	{
-		std::cout << "Delete: Point" << std::endl;
 		delete points[i];
-	}
-	lines.clear();
+	this->lines.clear();
 	this->points.clear();
 	this->pointsPositions.clear();
 	this->inputVectorX.clear();
@@ -529,7 +540,6 @@ void gui::Graph::update(std::vector<float> inputVectorX, std::vector<float> inpu
 	this->clearGraph();
 	this->inputVectorX = inputVectorX;
 	this->inputVectorY = inputVectorY;
-
 	if (this->inputVectorX.size() == this->inputVectorY.size() && this->inputVectorX.size() != 0)
 	{
 		this->text[0]->setString(title);
@@ -590,4 +600,74 @@ void gui::Graph::render(sf::RenderTarget * target)
 		target->draw(lines);
 	}
 	
+}
+
+/**************************************************************************
+********* PopUp ***********************************************************
+**************************************************************************/
+
+gui::PopUp::PopUp(sf::Font* font, std::string text, float x, float y)
+{
+	this->visibility = false;
+
+	this->font = font;
+
+	this->button_text.setFont(*this->font);
+	this->button_text.setCharacterSize(12);
+	this->button_text.setFillColor(sf::Color::Color::White);
+	this->button_text.setString("Ok");
+
+	this->text.setFont(*this->font);
+	this->text.setCharacterSize(12);
+	this->text.setFillColor(sf::Color::Color::White);
+	this->text.setString(text);
+
+	this->shape.setPosition(sf::Vector2f(x, y));
+	this->shape.setSize(sf::Vector2f(this->text.getGlobalBounds().width + 20.f, this->text.getGlobalBounds().height + 60.f));
+	this->text.setPosition(sf::Vector2f(this->shape.getPosition().x + 10, this->shape.getPosition().y + 10));
+	this->shape.setFillColor(sf::Color(51, 51, 51, 255));
+	this->shape.setOutlineColor(sf::Color(40, 40, 40, 255));
+	this->shape.setOutlineThickness(2);
+
+	this->button_shape.setSize(sf::Vector2f(30.f, 25.f));
+	this->button_shape.setPosition(sf::Vector2f(
+		this->shape.getPosition().x + this->shape.getSize().x / 2.f - this->button_shape.getSize().x / 2.f,
+		this->text.getPosition().y + this->text.getGlobalBounds().height + 20.f
+	));
+	this->button_shape.setFillColor(sf::Color(60, 60, 60, 255));
+	this->button_shape.setOutlineColor(sf::Color(45, 45, 45, 255));
+	this->button_shape.setOutlineThickness(1);
+
+	this->button_text.setPosition(sf::Vector2f(
+		this->button_shape.getPosition().x + (int)(this->button_shape.getSize().x / 2) - (int)(this->button_text.getGlobalBounds().width / 2.f),
+		this->button_shape.getPosition().y + (int)(this->button_shape.getSize().y / 2) - (int)(this->button_text.getGlobalBounds().height / 2.f) - 2.f
+	));
+}
+
+gui::PopUp::~PopUp()
+{
+}
+
+bool gui::PopUp::getVisibility()
+{
+	return visibility;
+}
+
+void gui::PopUp::setVisibility(bool value)
+{
+	this->visibility = value;
+}
+
+void gui::PopUp::update(sf::Vector2f mousePosition)
+{
+	if (this->button_shape.getGlobalBounds().contains(mousePosition) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		this->visibility = false;
+}
+
+void gui::PopUp::render(sf::RenderTarget * target)
+{
+	target->draw(this->shape);
+	target->draw(this->text);
+	target->draw(this->button_shape);
+	target->draw(this->button_text);
 }

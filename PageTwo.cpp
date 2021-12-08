@@ -1,5 +1,14 @@
 #include "PageTwo.h"
 
+void PageTwo::initPopUpText()
+{
+	this->popup1text.append("Non-inverting BJT voltage level shift\n\n");
+	this->popup1text.append("Valid prefixes: G, M, K, m, u, n, p");
+
+	this->popup2text.append("Inverting BJT voltage level shift\n\n");
+	this->popup2text.append("Valid prefixes: G, M, K, m, u, n, p");
+}
+
 void PageTwo::initBackground(sf::RenderWindow* window)
 {
 	this->background.setSize(sf::Vector2f((float)window->getSize().x, (float)window->getSize().y));
@@ -12,47 +21,37 @@ PageTwo::PageTwo(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* st
 		this->states->back()->endState();
 
 	this->calculateState = this->CALC_STATE_0;
+	this->initPopUpText();
 	this->initBackground(window);
 	this->initGUI();
-	std::cout << "Constuctor: MainMenu" << std::endl;
 }
 
 PageTwo::~PageTwo()
 {
-	std::cout << "Deconstuctor: MainMenu" << std::endl;
 	for (auto i = this->buttons.begin(); i != this->buttons.end(); i++)
-	{
-		std::cout << "Delete: Button" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->textboxes.begin(); i != this->textboxes.end(); i++)
-	{
-		std::cout << "Delete: TextBox" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->labels.begin(); i != this->labels.end(); i++)
-	{
-		std::cout << "Delete: Label" << std::endl;
 		delete i->second;
-	}
 
 	for (auto i = this->images.begin(); i != this->images.end(); i++)
-	{
-		std::cout << "Delete: Image" << std::endl;
 		delete i->second;
-	}
+
+	for (auto i = this->popups.begin(); i != this->popups.end(); i++)
+		delete i->second;
 
 	delete this->titlebar;
 	delete this->footer;
 }
 
-void PageTwo::calculate()
+void PageTwo::calculate(calculate_state calculateState)
 {
 	double vi, vo, ic1, ic2, hfe, vbe, vce, r1, r2, r3, v, ib1, ib2, ie1, ie2 = 0;
-	//double r1, r2, r3, v, ib1, ib2, ie1, ie2 = 0;
-	switch (this->calculateState)
+
+	switch (calculateState)
 	{
 	case this->CALC_STATE_0:
 		break;
@@ -60,14 +59,14 @@ void PageTwo::calculate()
 	case this->CALC_STATE_1:
 
 		/****************************
-		|	example					|
-		|	vi = 3.f;				|
-		|	vo = 5.f;				|
-		|	ic1 = 0.001f;			|
-		|	ic2 = 0.001f;			|
-		|	hfe = 100.f;			|
-		|	vbe = 0.648f;			|
-		|	vce = 0.041f;			|
+			example				
+			vi = 3.f;				
+			vo = 5.f;				
+			ic1 = 0.001f;			
+			ic2 = 0.001f;			
+			hfe = 100.f;			
+			vbe = 0.648f;			
+			vce = 0.041f;			
 		****************************/
 		vi = handleinput.getDouble(this->textboxes["TEXTBOX_1_I1_VI"]->getText());
 		vo = handleinput.getDouble(this->textboxes["TEXTBOX_1_I1_VO"]->getText());
@@ -122,8 +121,6 @@ void PageTwo::calculate()
 
 		textboxes["TEXTBOX_1_O1_IB1"]->setText(handleinput.toString(ib1));
 		textboxes["TEXTBOX_1_O1_IB2"]->setText(handleinput.toString(ib2));
-		
-		this->calculateState = this->CALC_STATE_0;
 		break;
 		/******************************************************************************************************/
 	case this->CALC_STATE_2:
@@ -172,20 +169,18 @@ void PageTwo::calculate()
 		textboxes["TEXTBOX_1_O2_IC2"]->setText(handleinput.toString(ic2));
 		textboxes["TEXTBOX_1_O2_IE1"]->setText(handleinput.toString(ie1));
 		textboxes["TEXTBOX_1_O2_IE2"]->setText(handleinput.toString(ie2));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
 		/******************************************************************************************************/
 	case this->CALC_STATE_3:
 		
 		/****************************
-		|	example					|
-		|	vi = 3.f;				|
-		|	vo = 5.f;				|
-		|	ic1 = 0.001f;			|
-		|	hfe = 100.f;			|
-		|	vbe = 0.648f;			|
-		|	vce = 0.041f;			|
+			example					
+			vi = 3.f;				
+			vo = 5.f;				
+			ic1 = 0.001f;			
+			hfe = 100.f;			
+			vbe = 0.648f;			
+			vce = 0.041f;			
 		****************************/
 
 		vi = handleinput.getDouble(this->textboxes["TEXTBOX_2_I1_VI"]->getText());
@@ -222,8 +217,6 @@ void PageTwo::calculate()
 		textboxes["TEXTBOX_2_O1_R2"]->setText(handleinput.toString(r2));
 		textboxes["TEXTBOX_2_O1_V"]->setText(handleinput.toString(v));
 		textboxes["TEXTBOX_2_O1_IB"]->setText(handleinput.toString(ib1));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
 		/******************************************************************************************************/
 	case this->CALC_STATE_4:
@@ -255,8 +248,6 @@ void PageTwo::calculate()
 		textboxes["TEXTBOX_2_O2_IB"]->setText(handleinput.toString(ib1));
 		textboxes["TEXTBOX_2_O2_IC"]->setText(handleinput.toString(ic1));
 		textboxes["TEXTBOX_2_O2_IE"]->setText(handleinput.toString(ie1));
-
-		this->calculateState = this->CALC_STATE_0;
 		break;
 		/******************************************************************************************************/
 	default:
@@ -267,7 +258,6 @@ void PageTwo::calculate()
 
 void PageTwo::endState()
 {
-	std::cout << "Ending state: MainMenu" << std::endl;
 	this->quit = true;
 }
 
@@ -276,6 +266,9 @@ void PageTwo::initGUI()
 	this->titlebar = new Titlebar(this->window, &this->font, "BJT level shift");
 	this->footer = new Footer(this->window, &this->font);
 
+	this->popups["POPUP_1"] = new gui::PopUp(&this->font, this->popup1text, 170.f, 150.f);
+	this->popups["POPUP_2"] = new gui::PopUp(&this->font, this->popup2text, 740.f, 150.f);
+
 	this->buttons["BUTTON_BACK"] = new gui::Button(22.f, 45.f, "Back", &this->font);
 
 	// SECTION 1  ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,6 +276,7 @@ void PageTwo::initGUI()
 
 	this->buttons["BUTTON_CALC_1"] = new gui::Button(80.f, 545.f, "Calculate", &this->font);
 	this->buttons["BUTTON_CALC_2"] = new gui::Button(300.f, 445.f, "Calculate", &this->font);
+	this->buttons["BUTTON_HELP_1"] = new gui::Button(180.f, 545.f, 25.f, 25.f, "?", &this->font);
 
 	this->textboxes["TEXTBOX_1_I1_VI"] = new gui::TextBox(80.f, 365.f, &this->font, true);
 	this->textboxes["TEXTBOX_1_I1_VO"] = new gui::TextBox(80.f, 390.f, &this->font, true);
@@ -341,6 +335,7 @@ void PageTwo::initGUI()
 
 	this->buttons["BUTTON_CALC_3"] = new gui::Button(630.f, 520.f, "Calculate", &this->font);
 	this->buttons["BUTTON_CALC_4"] = new gui::Button(850.f, 420.f, "Calculate", &this->font);
+	this->buttons["BUTTON_HELP_2"] = new gui::Button(730.f, 520.f, 25.f, 25.f, "?", &this->font);
 
 	this->textboxes["TEXTBOX_2_I1_VI"] = new gui::TextBox(630.f, 365.f, &this->font, true);
 	this->textboxes["TEXTBOX_2_I1_VO"] = new gui::TextBox(630.f, 390.f, &this->font, true);
@@ -386,47 +381,42 @@ void PageTwo::updateGUI()
 	this->titlebar->update(this->mousePositionView, this->window);
 
 	for (auto &i : this->buttons)
-	{
 		i.second->update(this->mousePositionView);
-	}
-	for (auto &i : this->textboxes)
-	{
-		i.second->update(this->mousePositionView);
-	}
 
-	if (buttons["BUTTON_BACK"]->isPressed())
+	for (auto &i : this->textboxes)
+		i.second->update(this->mousePositionView);
+
+	for (auto &i : this->popups)
+		i.second->update(this->mousePositionView);
+
+	if (buttons["BUTTON_BACK"]->isReleased())
 		this->states->push_front(new MainMenu(this->window, ev, states));
 
-	if (buttons["BUTTON_CALC_1"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_1;
-		this->calculate();
-	}
-	if (buttons["BUTTON_CALC_2"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_2;
-		this->calculate();
-	}
-	if (buttons["BUTTON_CALC_3"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_3;
-		this->calculate();
-	}
-	if (buttons["BUTTON_CALC_4"]->isPressed())
-	{
-		this->calculateState = this->CALC_STATE_4;
-		this->calculate();
-	}
-	
+	if (buttons["BUTTON_CALC_1"]->isReleased())
+		this->calculate(this->CALC_STATE_1);
 
+	if (buttons["BUTTON_CALC_2"]->isReleased())
+		this->calculate(this->CALC_STATE_2);
+
+	if (buttons["BUTTON_CALC_3"]->isReleased())
+		this->calculate(this->CALC_STATE_3);
+
+	if (buttons["BUTTON_CALC_4"]->isReleased())
+		this->calculate(this->CALC_STATE_4);
+
+	if (buttons["BUTTON_HELP_1"]->isReleased())
+		this->popups["POPUP_1"]->setVisibility(!this->popups["POPUP_1"]->getVisibility());
+
+	if (buttons["BUTTON_HELP_2"]->isReleased())
+		this->popups["POPUP_2"]->setVisibility(!this->popups["POPUP_2"]->getVisibility());
 }
 
 void PageTwo::updateInput()
 {
 	for (auto &i : this->textboxes)
-	{
 		i.second->updateText(this->ev);
-	}
+	for (auto &i : this->buttons)
+		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
 void PageTwo::updateMouseMov()
@@ -435,11 +425,11 @@ void PageTwo::updateMouseMov()
 }
 
 
-void PageTwo::update(/*const float& dt*/)
+void PageTwo::update()
 {
 	this->checkQuit();
 	this->updateMousePositions();
-	this->updateGUI(/*dt*/);
+	this->updateGUI();
 }
 
 void PageTwo::renderGUI(sf::RenderTarget * target)
@@ -447,24 +437,22 @@ void PageTwo::renderGUI(sf::RenderTarget * target)
 	this->titlebar->render(target);
 	this->footer->render(target);
 
-	for (auto &i : this->buttons)
-	{
-		i.second->render(target);
-	}
-
 	for (auto &i : this->textboxes)
-	{
 		i.second->render(target);
-	}
+
+	for (auto &i : this->buttons)
+		i.second->render(target);
 
 	for (auto &i : this->labels)
-	{
 		i.second->render(target);
-	}
 
 	for (auto &i : this->images)
-	{
 		i.second->render(target);
+
+	for (auto &i : this->popups)
+	{
+		if (i.second->getVisibility())
+			i.second->render(target);
 	}
 }
 
@@ -472,7 +460,7 @@ void PageTwo::render(sf::RenderTarget * target)
 {
 	if (!target)
 		target = this->window;
-	target->clear(/*sf::Color(37, 37, 37, 255)*/);
+	target->clear();
 	target->draw(this->background);
 	this->renderGUI(target);
 }

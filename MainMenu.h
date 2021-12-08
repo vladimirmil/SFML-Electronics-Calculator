@@ -26,7 +26,7 @@ public:
 	void updateGUI();
 	void updateInput();
 	void updateMouseMov();
-	void update(/*const float& dt*/);
+	void update();
 	void renderGUI(sf::RenderTarget * target);
 	void render(sf::RenderTarget* target = nullptr);
 };

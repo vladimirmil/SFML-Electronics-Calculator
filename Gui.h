@@ -14,21 +14,17 @@ namespace gui
 		sf::RectangleShape shape;
 		sf::Font* font;
 		sf::Text text;
-		sf::Color idleColor;
-		sf::Color hoverColor;
-		sf::Color pressedColor;
-		sf::Color outlineColor;
-		sf::Texture textureIdle;
-		sf::Texture textureHover;
-		sf::Texture texturePressed;
-		float outlineThickness;
+		sf::Color idleColor, hoverColor, pressedColor, outlineColor;
+		sf::Texture textureIdle, textureHover, texturePressed;
+		float outlineThickness, isButtonReleased;
 		bool isImage;
 		short unsigned buttonState;
 
 		enum button_state {
-			BUTTON_IDLE,
+			BUTTON_IDLE = 0,
 			BUTTON_HOVER,
 			BUTTON_PRESSED,
+			BUTTON_RELEASED,
 		};
 
 		void initVariables(sf::Color idleColor, sf::Color hoverColor, sf::Color pressedColor, sf::Color outlineColor, float outlineThickness);
@@ -38,6 +34,7 @@ namespace gui
 
 	public:
 		Button(float x, float y, std::string text, sf::Font* font);
+		Button(float x, float y, float width, float height, std::string text, sf::Font* font);
 		Button(float x, float y, float width, float height,
 			sf::Font* font, std::string text, sf::Color idleColor, sf::Color hoverColor,
 			sf::Color pressedColor, sf::Color outlineColor, float outlineThickness);
@@ -45,6 +42,9 @@ namespace gui
 		virtual ~Button();
 
 		const bool isPressed();
+		const bool isReleased();
+		int getButtonState();
+		void updateEvent(sf::Event* ev, sf::Vector2f mousePosition);
 		void update(sf::Vector2f mousePosition);
 		void render(sf::RenderTarget* target);
 	};
@@ -64,20 +64,16 @@ namespace gui
 	class TextBox
 	{
 	private:
-		sf::RectangleShape shape;
-		sf::RectangleShape cursor;
+		sf::RectangleShape shape, cursor;
 		sf::Font* font;
 		sf::Text text;
 
 		std::string s;
-		float width;
-		float height;
-		bool isSelected;
-		bool isInput;
+		float width, height;
+		bool isSelected, isInput;
 		short unsigned textboxState;
 		const int TEXT_OFFSET_X = 5;
 		const int TEXT_OFFSET_Y = 8;
-		const int MAX_TEXT_LENGHT = 68;
 		const int BACKSPACE_KEY = 8;
 		const int ENTER_KEY = 9;
 		const int TAB_KEY = 13;
@@ -123,16 +119,13 @@ namespace gui
 
 	class Graph {
 	private:
-		sf::RectangleShape background;
-		sf::RectangleShape background2;
+		sf::RectangleShape background, background2;
 		sf::Font* font;
 		sf::VertexArray lines;
 		std::vector<sf::Text*> text;
 		std::vector<sf::CircleShape*> points;
 		std::vector<sf::Vector2f> pointsPositions;
-		std::vector<float> inputVectorX;
-		std::vector<float> inputVectorY;
-		
+		std::vector<float> inputVectorX, inputVectorY;		
 		int numberOfPoints;
 		float spacing, margin, minY, maxY, minX, maxX, x, y, width, height;
 
@@ -146,6 +139,22 @@ namespace gui
 
 		void clearGraph();
 		void update(std::vector<float> inputVectorX, std::vector<float> inputVectorY, std::string title);
+		void render(sf::RenderTarget* target);
+	};
+
+	class PopUp {
+	private:
+		sf::RectangleShape shape, button_shape;
+		sf::Font* font;
+		sf::Text text, button_text;
+		bool visibility;
+	public:
+		PopUp(sf::Font* font, std::string text, float x, float y);
+		virtual ~PopUp();
+
+		bool getVisibility();
+		void setVisibility(bool value);
+		void update(sf::Vector2f mousePosition);
 		void render(sf::RenderTarget* target);
 	};
 }

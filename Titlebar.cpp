@@ -58,10 +58,12 @@ void Titlebar::updateWindowPosition(sf::RenderWindow* window)
 		window->setPosition(sf::Mouse::getPosition() + this->grabbedOffset);
 }
 
+
 void Titlebar::update(sf::Vector2f mousePosition, sf::RenderWindow* window)
 {
 	if (this->shape.getGlobalBounds().contains(mousePosition) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
+		
 		this->setPressed(true);
 		this->grabbedOffset = window->getPosition() - sf::Mouse::getPosition();
 	}
@@ -71,7 +73,8 @@ void Titlebar::update(sf::Vector2f mousePosition, sf::RenderWindow* window)
 	}
 
 	this->exitButton->update(mousePosition);
-	if (this->exitButton->isPressed())
+
+	if (exitButton->getButtonState() == 2 && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		window->close();
 }
 
