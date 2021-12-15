@@ -59,7 +59,7 @@ void gui::Button::initTexture(std::string textureLocationIdle, std::string textu
 gui::Button::Button(float x, float y, std::string text, sf::Font * font)
 {
 	this->initVariables(sf::Color::Color(45, 45, 45, 255), sf::Color::Color(50, 50, 50, 255),
-						sf::Color::Color(55, 55, 55, 255), sf::Color::Color(40, 40, 40, 255), 1.f);
+			    sf::Color::Color(55, 55, 55, 255), sf::Color::Color(40, 40, 40, 255), 1.f);
 	this->initShape(x, y, 80.f, 25.f);
 	this->initText(font, text);
 }
@@ -67,7 +67,7 @@ gui::Button::Button(float x, float y, std::string text, sf::Font * font)
 gui::Button::Button(float x, float y, float width, float height, std::string text, sf::Font * font)
 {
 	this->initVariables(sf::Color::Color(45, 45, 45, 255), sf::Color::Color(50, 50, 50, 255),
-						sf::Color::Color(55, 55, 55, 255), sf::Color::Color(40, 40, 40, 255), 1.f);
+			    sf::Color::Color(55, 55, 55, 255), sf::Color::Color(40, 40, 40, 255), 1.f);
 	this->initShape(x, y, width, height);
 	this->initText(font, text);
 }
