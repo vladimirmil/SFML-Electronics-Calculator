@@ -411,6 +411,7 @@ void gui::Graph::initVariables(float x, float y, float height, float width, floa
 	this->margin = margin;
 	this->inputVectorX = inputVectorX;
 	this->inputVectorY = inputVectorY;
+	this->lineColor = sf::Color::Color::White;
 }
 
 
@@ -498,9 +499,11 @@ void gui::Graph::initGraph()
 
 			this->points[i]->setPosition(sf::Vector2f(this->pointsPositions[i].x, this->pointsPositions[i].y));
 			this->points[i]->setRadius(3);
-			this->points[i]->setFillColor(sf::Color::Red);
+			//this->points[i]->setFillColor(sf::Color::Red);
+			this->points[i]->setFillColor(this->lineColor);
 			this->points[i]->setPointCount(50);
-			this->lines[i].color = sf::Color::Red;
+			//this->lines[i].color = sf::Color::Red;
+			this->lines[i].color = this->lineColor;
 			this->lines[i].position = sf::Vector2f(this->pointsPositions[i].x + 2.f, this->pointsPositions[i].y + 2.f);
 		}
 	}
@@ -522,6 +525,17 @@ gui::Graph::~Graph()
 
 	for (unsigned int i = 0; i < this->text.size(); i++)
 		delete text[i];
+}
+
+void gui::Graph::setColor(sf::Color color)
+{
+	this->lineColor = color;
+
+	for (int i = 0; i < this->numberOfPoints; i++)
+	{
+		this->points[i]->setFillColor(this->lineColor);
+		this->lines[i].color = this->lineColor;
+	}
 }
 
 void gui::Graph::clearGraph()
@@ -573,9 +587,9 @@ void gui::Graph::update(std::vector<float> inputVectorX, std::vector<float> inpu
 
 			this->points[i]->setPosition(sf::Vector2f(this->pointsPositions[i].x, this->pointsPositions[i].y));
 			this->points[i]->setRadius(3);
-			this->points[i]->setFillColor(sf::Color::Red);
+			this->points[i]->setFillColor(this->lineColor);
 			this->points[i]->setPointCount(50);
-			this->lines[i].color = sf::Color::Red;
+			this->lines[i].color = this->lineColor;
 			this->lines[i].position = sf::Vector2f(this->pointsPositions[i].x + 2.f, this->pointsPositions[i].y + 2.f);
 		}
 	}
@@ -589,7 +603,7 @@ void gui::Graph::render(sf::RenderTarget * target)
 	target->draw(this->background);
 	target->draw(this->background2);
 		
-	for (int i = 0; i < 5; i++)
+	for (unsigned int i = 0; i < this->text.size(); i++)
 	{
 		target->draw(*this->text[i]);
 	}

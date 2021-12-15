@@ -16,7 +16,7 @@ private:
 public:
 	Titlebar(sf::RenderWindow* window, sf::Font* font);
 	Titlebar(sf::RenderWindow* window, sf::Font* font, std::string title);
-	virtual ~Titlebar();
+	~Titlebar();
 
 	void setPressed(bool value);
 	const bool getPressed();

@@ -1,7 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "State.h"
+#include "Page.h"
 
 constexpr auto WINDOW_WIDTH = 1100;
 constexpr auto WINDOW_HEIGHT = 640;
@@ -14,7 +14,7 @@ private:
 	sf::RenderWindow* window;
 	sf::VideoMode videoMode;
 	sf::Event ev;
-	std::deque<State*> states;
+	std::deque<Page*> pages;
 	bool hasFocus;
 	void initVariables();
 	void initWindow();

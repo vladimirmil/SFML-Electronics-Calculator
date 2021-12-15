@@ -1,21 +1,21 @@
-#include "PageThree.h"
+#include "Page3.h"
 
-void PageThree::initBackground(sf::RenderWindow* window)
+void Page3::initBackground(sf::RenderWindow* window)
 {
 	this->background.setSize(sf::Vector2f((float)window->getSize().x, (float)window->getSize().y));
 	this->background.setFillColor(sf::Color(37, 37, 37, 255));
 }
-
-PageThree::PageThree(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states) : State(window, ev, states)
+																							
+Page3::Page3(sf::RenderWindow* window, sf::Event* ev, std::deque<Page*>* pages) : Page(window, ev, pages)
 {
-	if (!this->states->empty())
-		this->states->back()->endState();
+	if (!this->pages->empty())
+		this->pages->back()->endState();
 
 	this->initBackground(window);
 	this->initGUI();
 }
 
-PageThree::~PageThree()
+Page3::~Page3()
 {
 	for (auto i = this->buttons.begin(); i != this->buttons.end(); i++)
 		delete i->second;
@@ -27,18 +27,18 @@ PageThree::~PageThree()
 	delete this->footer;
 }
 
-void PageThree::updateInput()
+void Page3::updateInput()
 {
 	for (auto &i : this->buttons)
 		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
-void PageThree::updateMouseMov()
+void Page3::updateMouseMov()
 {
 	this->titlebar->updateWindowPosition(this->window);
 }
 
-void PageThree::initGUI()
+void Page3::initGUI()
 {
 	this->titlebar = new Titlebar(this->window, &this->font, "Page 3");
 	this->footer = new Footer(this->window, &this->font);
@@ -48,7 +48,7 @@ void PageThree::initGUI()
 	this->labels["LABEL_EMPTY"] = new gui::Label(540.f, 320.f, &this->font, "Empty", 12, sf::Color::White);
 }
 
-void PageThree::updateGUI()
+void Page3::updateGUI()
 {
 	this->titlebar->update(this->mousePositionView, this->window);
 
@@ -56,10 +56,10 @@ void PageThree::updateGUI()
 		i.second->update(this->mousePositionView);
 
 	if (buttons["BUTTON_BACK"]->isReleased())
-		this->states->push_front(new MainMenu(this->window, ev, states));
+		this->pages->push_front(new PageMainMenu(this->window, ev, pages));
 }
 
-void PageThree::renderGUI(sf::RenderTarget * target)
+void Page3::renderGUI(sf::RenderTarget * target)
 {
 	this->titlebar->render(target);
 	this->footer->render(target);
@@ -71,19 +71,19 @@ void PageThree::renderGUI(sf::RenderTarget * target)
 		i.second->render(target);
 }
 
-void PageThree::endState()
+void Page3::endState()
 {
 	this->quit = true;
 }
 
-void PageThree::update()
+void Page3::update()
 {
 	this->checkQuit();
 	this->updateMousePositions();
 	this->updateGUI();
 }
 
-void PageThree::render(sf::RenderTarget * target)
+void Page3::render(sf::RenderTarget * target)
 {
 	if (!target)
 		target = this->window;

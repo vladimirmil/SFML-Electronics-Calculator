@@ -122,6 +122,7 @@ namespace gui
 		sf::RectangleShape background, background2;
 		sf::Font* font;
 		sf::VertexArray lines;
+		sf::Color lineColor;
 		std::vector<sf::Text*> text;
 		std::vector<sf::CircleShape*> points;
 		std::vector<sf::Vector2f> pointsPositions;
@@ -137,6 +138,7 @@ namespace gui
 		Graph(sf::Font* font, std::string title, std::vector<float> inputVectorX, std::vector<float> inputVectorY, float x, float y, float width, float height, float margin);
 		virtual ~Graph();
 
+		void setColor(sf::Color color);
 		void clearGraph();
 		void update(std::vector<float> inputVectorX, std::vector<float> inputVectorY, std::string title);
 		void render(sf::RenderTarget* target);

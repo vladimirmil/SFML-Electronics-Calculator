@@ -133,7 +133,7 @@ double HandleInput::logic(std::vector<std::string>& list, std::vector<std::strin
 	else
 	{
 		this->error = true;
-		std::cout << "Error: Something went wrong" << std::endl;
+		std::cerr << "Error: Something went wrong" << std::endl;
 		return -1;
 	}
 
@@ -264,7 +264,6 @@ void HandleInput::stringToVectorFloat(std::vector<float> &inputvector, std::stri
 
 std::string HandleInput::getString(std::string input)
 {
-	std::stringstream ss;
 	this->input_vector.clear();
 	this->p = "";
 	this->result = -1;
@@ -276,10 +275,9 @@ std::string HandleInput::getString(std::string input)
 	}
 	else
 	{
-		std::cout << "ERROR: Input contains multiple decimal places" << std::endl;
+		std::cerr << "ERROR: Input contains multiple decimal places" << std::endl;
 	}
-	ss << result;
-	return ss.str();
+	return this->toString(result);
 }
 
 double HandleInput::getDouble(std::string input)
@@ -295,7 +293,7 @@ double HandleInput::getDouble(std::string input)
 	}
 	else
 	{
-		std::cout << "ERROR: Input contains multiple decimal places" << std::endl;
+		std::cerr << "ERROR: Input contains multiple decimal places" << std::endl;
 	}
 
 	return result;

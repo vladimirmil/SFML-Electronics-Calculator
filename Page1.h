@@ -1,12 +1,11 @@
-#ifndef PAGE_ONE_H
-#define PAGE_ONE_H
+#ifndef PAGE_1_H
+#define PAGE_1_H
 
-#include "State.h"
-#include "MainMenu.h"
-#include <string>
+#include "Page.h"
+#include "PageMainMenu.h"
 
-class PageOne :
-	public State
+class Page1 :
+	public Page
 {
 private:
 	sf::RectangleShape background;
@@ -34,8 +33,8 @@ private:
 	void initPopUpText();
 public:
 
-	PageOne(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states);
-	virtual ~PageOne();
+	Page1(sf::RenderWindow* window, sf::Event* ev, std::deque<Page*>* pages);
+	virtual ~Page1();
 
 	void calculate(calculate_state calculateState);
 	void endState();

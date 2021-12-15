@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "MainMenu.h"
+#include "PageMainMenu.h"
 
 void Application::initVariables()
 {
@@ -11,7 +11,7 @@ void Application::initWindow()
 	this->hasFocus = true;
 	this->videoMode.height = WINDOW_HEIGHT;
 	this->videoMode.width = WINDOW_WIDTH;
-	this->window = new sf::RenderWindow(this->videoMode, "title", sf::Style::None);
+	this->window = new sf::RenderWindow(this->videoMode, "Yo", sf::Style::None);
 	this->window->setKeyRepeatEnabled(false);
 	this->window->setFramerateLimit(FRAMERATE_LIMIT);
 	this->window->setVerticalSyncEnabled(true);
@@ -19,7 +19,7 @@ void Application::initWindow()
 
 void Application::initStates()
 {
-	this->states.push_front(new MainMenu(this->window, &this->ev, &this->states));
+	this->pages.push_front(new PageMainMenu(this->window, &this->ev, &this->pages));
 }
 
 Application::Application()
@@ -31,10 +31,10 @@ Application::Application()
 
 Application::~Application()
 {
-	while (!this->states.empty())
+	while (!this->pages.empty())
 	{
-		delete this->states.front();
-		this->states.pop_front();
+		delete this->pages.front();
+		this->pages.pop_front();
 	}
 	delete this->window;
 }
@@ -59,17 +59,17 @@ void Application::pollEvents()
 			break;
 
 		case sf::Event::TextEntered:
-			if (!this->states.empty() && this->hasFocus)
-				this->states.front()->updateInput();
+			if (!this->pages.empty() && this->hasFocus)
+				this->pages.front()->updateInput();
 			break;
 		case sf::Event::MouseMoved:
-			if (!this->states.empty() && this->hasFocus)
-				this->states.front()->updateMouseMov();
+			if (!this->pages.empty() && this->hasFocus)
+				this->pages.front()->updateMouseMov();
 			break;
 		
 		case sf::Event::MouseButtonReleased:
-			if (!this->states.empty() && this->hasFocus)
-				this->states.front()->updateInput();
+			if (!this->pages.empty() && this->hasFocus)
+				this->pages.front()->updateInput();
 			break;
 		
 		case sf::Event::Closed:
@@ -86,15 +86,15 @@ void Application::update()
 {
 	this->pollEvents();
 
-	if (!this->states.empty())
+	if (!this->pages.empty())
 	{
 		if (this->hasFocus)
-			this->states.front()->update();
+			this->pages.front()->update();
 
-		if (this->states.back()->getQuit())
+		if (this->pages.back()->getQuit())
 		{
-			delete this->states.back();
-			this->states.pop_back();
+			delete this->pages.back();
+			this->pages.pop_back();
 		}		
 	}
 	else
@@ -107,8 +107,8 @@ void Application::render()
 {
 	this->window->clear();
 
-	if (!this->states.empty())
-		this->states.front()->render(this->window);
+	if (!this->pages.empty())
+		this->pages.front()->render(this->window);
 	this->window->display();
 }
 

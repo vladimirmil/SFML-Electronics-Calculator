@@ -1,6 +1,6 @@
-#include "PageTwo.h"
+#include "Page2.h"
 
-void PageTwo::initPopUpText()
+void Page2::initPopUpText()
 {
 	this->popup1text.append("Non-inverting BJT voltage level shift\n\n");
 	this->popup1text.append("Valid prefixes: G, M, K, m, u, n, p");
@@ -9,16 +9,16 @@ void PageTwo::initPopUpText()
 	this->popup2text.append("Valid prefixes: G, M, K, m, u, n, p");
 }
 
-void PageTwo::initBackground(sf::RenderWindow* window)
+void Page2::initBackground(sf::RenderWindow* window)
 {
 	this->background.setSize(sf::Vector2f((float)window->getSize().x, (float)window->getSize().y));
 	this->background.setFillColor(sf::Color(37, 37, 37, 255));
 }
 
-PageTwo::PageTwo(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states) : State(window, ev, states)
+Page2::Page2(sf::RenderWindow* window, sf::Event* ev, std::deque<Page*>* pages) : Page(window, ev, pages)
 {
-	if (!this->states->empty())
-		this->states->back()->endState();
+	if (!this->pages->empty())
+		this->pages->back()->endState();
 
 	this->calculateState = this->CALC_STATE_0;
 	this->initPopUpText();
@@ -26,7 +26,7 @@ PageTwo::PageTwo(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* st
 	this->initGUI();
 }
 
-PageTwo::~PageTwo()
+Page2::~Page2()
 {
 	for (auto i = this->buttons.begin(); i != this->buttons.end(); i++)
 		delete i->second;
@@ -47,7 +47,7 @@ PageTwo::~PageTwo()
 	delete this->footer;
 }
 
-void PageTwo::calculate(calculate_state calculateState)
+void Page2::calculate(calculate_state calculateState)
 {
 	double vi, vo, ic1, ic2, hfe, vbe, vce, r1, r2, r3, v, ib1, ib2, ie1, ie2 = 0;
 
@@ -256,12 +256,12 @@ void PageTwo::calculate(calculate_state calculateState)
 
 }
 
-void PageTwo::endState()
+void Page2::endState()
 {
 	this->quit = true;
 }
 
-void PageTwo::initGUI()
+void Page2::initGUI()
 {
 	this->titlebar = new Titlebar(this->window, &this->font, "BJT level shift");
 	this->footer = new Footer(this->window, &this->font);
@@ -376,7 +376,7 @@ void PageTwo::initGUI()
 	this->labels["LABEL_2_O2_IE"] = new gui::Label(938.f, 415.f, &this->font, "Ie", 12, sf::Color::White);
 }
 
-void PageTwo::updateGUI()
+void Page2::updateGUI()
 {
 	this->titlebar->update(this->mousePositionView, this->window);
 
@@ -390,7 +390,7 @@ void PageTwo::updateGUI()
 		i.second->update(this->mousePositionView);
 
 	if (buttons["BUTTON_BACK"]->isReleased())
-		this->states->push_front(new MainMenu(this->window, ev, states));
+		this->pages->push_front(new PageMainMenu(this->window, ev, pages));
 
 	if (buttons["BUTTON_CALC_1"]->isReleased())
 		this->calculate(this->CALC_STATE_1);
@@ -411,7 +411,7 @@ void PageTwo::updateGUI()
 		this->popups["POPUP_2"]->setVisibility(!this->popups["POPUP_2"]->getVisibility());
 }
 
-void PageTwo::updateInput()
+void Page2::updateInput()
 {
 	for (auto &i : this->textboxes)
 		i.second->updateText(this->ev);
@@ -419,20 +419,20 @@ void PageTwo::updateInput()
 		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
-void PageTwo::updateMouseMov()
+void Page2::updateMouseMov()
 {
 	this->titlebar->updateWindowPosition(this->window);
 }
 
 
-void PageTwo::update()
+void Page2::update()
 {
 	this->checkQuit();
 	this->updateMousePositions();
 	this->updateGUI();
 }
 
-void PageTwo::renderGUI(sf::RenderTarget * target)
+void Page2::renderGUI(sf::RenderTarget * target)
 {
 	this->titlebar->render(target);
 	this->footer->render(target);
@@ -456,7 +456,7 @@ void PageTwo::renderGUI(sf::RenderTarget * target)
 	}
 }
 
-void PageTwo::render(sf::RenderTarget * target)
+void Page2::render(sf::RenderTarget * target)
 {
 	if (!target)
 		target = this->window;

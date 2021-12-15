@@ -1,12 +1,12 @@
-#include "PageOne.h"
+#include "Page1.h"
 
-void PageOne::initBackground(sf::RenderWindow* window)
+void Page1::initBackground(sf::RenderWindow* window)
 {
 	this->background.setSize(sf::Vector2f((float)window->getSize().x, (float)window->getSize().y));
 	this->background.setFillColor(sf::Color(37, 37, 37, 255));
 }
 
-void PageOne::initPopUpText()
+void Page1::initPopUpText()
 {
 	this->popup1text.append("Non-inv op-amp with non-inv reference\n\n");
 	this->popup1text.append("This circuit can be used to translate\na sensor output voltage with a positive\n");
@@ -29,10 +29,10 @@ void PageOne::initPopUpText()
 	this->popup4text.append("Valid prefixes: G, M, K, m, u, n, p");
 }
 
-PageOne::PageOne(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* states) : State(window, ev, states)
+Page1::Page1(sf::RenderWindow* window, sf::Event* ev, std::deque<Page*>* pages) : Page(window, ev, pages)
 {
-	if (!this->states->empty())
-		this->states->back()->endState();
+	if (!this->pages->empty())
+		this->pages->back()->endState();
 
 	this->calculateState = this->CALC_STATE_0;
 	this->initPopUpText();
@@ -40,7 +40,7 @@ PageOne::PageOne(sf::RenderWindow* window, sf::Event* ev, std::deque<State*>* st
 	this->initGUI();
 }
 
-PageOne::~PageOne()
+Page1::~Page1()
 {
 	for (auto i = this->buttons.begin(); i != this->buttons.end(); i++)
 		delete i->second;
@@ -61,7 +61,7 @@ PageOne::~PageOne()
 	delete this->footer;
 }
 
-void PageOne::calculate(calculate_state calculateState)
+void Page1::calculate(calculate_state calculateState)
 {
 	double r1, r2, r3, r4, vimin, vimax, vomin, vomax, vr, gain = 0;
 
@@ -74,7 +74,7 @@ void PageOne::calculate(calculate_state calculateState)
 		vomin = handleinput.getDouble(this->textboxes["TEXTBOX_1_VOMIN"]->getText());
 		vomax = handleinput.getDouble(this->textboxes["TEXTBOX_1_VOMAX"]->getText());
 		vr = handleinput.getDouble(this->textboxes["TEXTBOX_1_VR"]->getText());
-
+		
 		r1 = 1000;
 		r4 = 1000;
 
@@ -107,7 +107,6 @@ void PageOne::calculate(calculate_state calculateState)
 				std::cerr << e.what() << std::endl;
 			}
 		}
-
 		textboxes["TEXTBOX_1_R1"]->setText(handleinput.toString(r1));
 		textboxes["TEXTBOX_1_R2"]->setText(handleinput.toString(r2));
 		textboxes["TEXTBOX_1_R3"]->setText(handleinput.toString(r3));
@@ -246,12 +245,12 @@ void PageOne::calculate(calculate_state calculateState)
 	
 }
 
-void PageOne::endState()
+void Page1::endState()
 {
 	this->quit = true;
 }
 
-void PageOne::initGUI()
+void Page1::initGUI()
 {
 	this->titlebar = new Titlebar(this->window, &this->font, "Signal conditioning");
 	this->footer = new Footer(this->window, &this->font);
@@ -363,7 +362,7 @@ void PageOne::initGUI()
 
 }
 
-void PageOne::updateGUI()
+void Page1::updateGUI()
 {
 	this->titlebar->update(this->mousePositionView, this->window);
 
@@ -377,7 +376,7 @@ void PageOne::updateGUI()
 		i.second->update(this->mousePositionView);
 
 	if (buttons["BUTTON_BACK"]->isReleased())
-		this->states->push_front(new MainMenu(this->window, ev, states));
+		this->pages->push_front(new PageMainMenu(this->window, ev, pages));
 
 	if (buttons["BUTTON_CALC_1"]->isReleased())
 		this->calculate(this->CALC_STATE_1);
@@ -406,7 +405,7 @@ void PageOne::updateGUI()
 		this->popups["POPUP_4"]->setVisibility(!this->popups["POPUP_4"]->getVisibility());
 }
 
-void PageOne::updateInput()
+void Page1::updateInput()
 {
 	for (auto &i : this->textboxes)
 		i.second->updateText(this->ev);
@@ -415,20 +414,20 @@ void PageOne::updateInput()
 		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
-void PageOne::updateMouseMov()
+void Page1::updateMouseMov()
 {
 	this->titlebar->updateWindowPosition(this->window);
 }
 
 
-void PageOne::update()
+void Page1::update()
 {
 	this->checkQuit();
 	this->updateMousePositions();
 	this->updateGUI();
 }
 
-void PageOne::renderGUI(sf::RenderTarget * target)
+void Page1::renderGUI(sf::RenderTarget * target)
 {
 	this->titlebar->render(target);
 	this->footer->render(target);
@@ -452,7 +451,7 @@ void PageOne::renderGUI(sf::RenderTarget * target)
 	}
 }
 
-void PageOne::render(sf::RenderTarget * target)
+void Page1::render(sf::RenderTarget * target)
 {
 	if (!target)
 		target = this->window;

@@ -8,7 +8,7 @@ Footer::Footer(sf::RenderWindow* window, sf::Font* font)
 
 	this->font = font;
 	this->author.setFont(*this->font);
-	this->author.setString(L"Vladimir Milivojevi�");
+	this->author.setString(sAuthor);
 	this->author.setCharacterSize(10);
 	this->author.setFillColor(sf::Color::Color(60, 60, 60, 255));
 	this->author.setPosition(5,625);
@@ -18,13 +18,10 @@ Footer::Footer(sf::RenderWindow* window, sf::Font* font)
 	this->version.setCharacterSize(10);
 	this->version.setFillColor(sf::Color::Color(60, 60, 60, 255));
 	this->version.setPosition(1075, 625);
-
-	std::cout << "Footer Constuctor" << std::endl;
 }
 
 Footer::~Footer()
 {
-	std::cout << "Footer Deconstuctor" << std::endl;
 }
 
 void Footer::render(sf::RenderTarget * target)

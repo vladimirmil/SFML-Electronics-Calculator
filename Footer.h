@@ -6,7 +6,7 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 
-const std::string sVersion = "v1.0";
+const std::string sAuthor = "Vladimir Milivojevic", sVersion = "v1.0";
 
 class Footer
 {
