@@ -33,8 +33,8 @@ void PageMain::initGUI()
 
 	this->buttons["BUTTON_PAGE1"] = new gui::Button(60.f, 100.f, sf::Color(40, 40, 40, 255), 1.f, "Images/idle1.png", "Images/hover1.png", "Images/pressed1.png");
 	this->buttons["BUTTON_PAGE2"] = new gui::Button(320.f, 100.f, sf::Color(40, 40, 40, 255), 1.f, "Images/idle2.png", "Images/hover2.png", "Images/pressed2.png");
-	this->buttons["BUTTON_PAGE3"] = new gui::Button(580.f, 100.f, sf::Color(40, 40, 40, 255), 1.f, "Images/idle3.png", "Images/hover3.png", "Images/pressed3.png");
-	this->buttons["BUTTON_PAGE4"] = new gui::Button(840.f, 100.f, sf::Color(40, 40, 40, 255), 1.f, "Images/idle3.png", "Images/hover3.png", "Images/pressed3.png");
+	this->buttons["BUTTON_PAGE3"] = new gui::Button(580.f, 100.f, sf::Color(40, 40, 40, 255), 1.f, "Images/idleempty.png", "Images/hoverempty.png", "Images/pressedempty.png");
+	this->buttons["BUTTON_PAGE4"] = new gui::Button(840.f, 100.f, sf::Color(40, 40, 40, 255), 1.f, "Images/idleempty.png", "Images/hoverempty.png", "Images/pressedempty.png");
 }
 
 void PageMain::updateGUI()
