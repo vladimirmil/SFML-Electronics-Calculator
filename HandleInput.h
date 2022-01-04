@@ -1,3 +1,12 @@
+/************************************************************************************
+ * @file HandleInput.h
+ *
+ * @brief Class for handling user input
+ *
+ * @author Vladimir Milivojevic
+ *
+ ************************************************************************************/
+
 #ifndef HANDLE_INPUT_H
 #define HANDLE_INPUT_H
 

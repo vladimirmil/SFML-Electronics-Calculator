@@ -52,6 +52,20 @@ const bool Titlebar::getPressed()
 	return false;
 }
 
+void Titlebar::updateInput(sf::Event * ev, sf::Vector2f mousePositionView)
+{
+	this->exitButton->updateEvent(ev, mousePositionView);
+}
+
+void Titlebar::updateMouse(sf::RenderWindow * window, sf::Event * ev, sf::Vector2f mousePosition)
+{
+	if (this->shape.getGlobalBounds().contains(mousePosition) && ev->mouseButton.button == sf::Mouse::Left)
+	{
+		this->setPressed(true);
+		this->grabbedOffset = window->getPosition() - sf::Mouse::getPosition();
+	}
+}
+
 void Titlebar::updateWindowPosition(sf::RenderWindow* window)
 {
 	if (this->getPressed())
@@ -61,6 +75,11 @@ void Titlebar::updateWindowPosition(sf::RenderWindow* window)
 
 void Titlebar::update(sf::Vector2f mousePosition, sf::RenderWindow* window)
 {
+	this->exitButton->update(mousePosition);
+
+	if (this->exitButton->isReleased())
+		window->close();
+	/*
 	if (this->shape.getGlobalBounds().contains(mousePosition) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 	{
 		
@@ -76,11 +95,13 @@ void Titlebar::update(sf::Vector2f mousePosition, sf::RenderWindow* window)
 
 	if (exitButton->getButtonState() == 2 && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		window->close();
+	*/
 }
 
 void Titlebar::render(sf::RenderTarget * target)
 {
 	target->draw(this->shape);
-	this->exitButton->render(target);
 	target->draw(this->title);
+	this->exitButton->render(target);
+	
 }

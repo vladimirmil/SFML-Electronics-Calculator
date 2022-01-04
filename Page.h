@@ -1,3 +1,12 @@
+/************************************************************************************
+ * @file Page.h
+ *
+ * @brief Base class for every page
+ *
+ * @author Vladimir Milivojevic
+ *
+ ************************************************************************************/
+
 #ifndef PAGE_H
 #define PAGE_H
 
@@ -8,8 +17,6 @@
 #include <stack>
 
 #include "Gui.h"
-#include "Footer.h"
-#include "Titlebar.h"
 #include "HandleInput.h"
 
 class Page
@@ -38,7 +45,6 @@ public:
 
 	virtual void endState() = 0;
 	virtual void updateInput() = 0;
-	virtual void updateMouseMov() = 0;
 	virtual void update() = 0;
 	virtual void render(sf::RenderTarget* target = nullptr) = 0;
 };

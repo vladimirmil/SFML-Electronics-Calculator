@@ -1,3 +1,12 @@
+/************************************************************************************
+ * @file Titlebar.h
+ *
+ * @brief Custom titlebar
+ *
+ * @author Vladimir Milivojevic
+ *
+ ************************************************************************************/
+
 #ifndef TITLEBAR_H
 #define TITLEBAR_H
 
@@ -20,7 +29,9 @@ public:
 
 	void setPressed(bool value);
 	const bool getPressed();
-	void updateWindowPosition(sf::RenderWindow* window);
+	void updateInput(sf::Event * ev, sf::Vector2f mousePositionView); // Called from pollEvents() in Application
+	void updateMouse(sf::RenderWindow* window, sf::Event* ev, sf::Vector2f mousePosition); // Called from pollEvents() in Application
+	void updateWindowPosition(sf::RenderWindow* window); // Called from pollEvents() in Application
 	void update(sf::Vector2f mousePosition, sf::RenderWindow* window);
 	void render(sf::RenderTarget* target);
 };

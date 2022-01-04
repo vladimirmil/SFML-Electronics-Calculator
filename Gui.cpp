@@ -9,11 +9,18 @@ void gui::Button::initVariables(sf::Color idleColor, sf::Color hoverColor, sf::C
 	this->isButtonReleased = false;
 	this->isImage = false;
 	this->buttonState = this->BUTTON_IDLE;
+	this->textSize = 14;
+
 	this->outlineColor = outlineColor;
 	this->outlineThickness = outlineThickness;
+
 	this->idleColor = idleColor;
 	this->hoverColor = hoverColor;
 	this->pressedColor = pressedColor;
+
+	this->idleTextColor = sf::Color::White;
+	this->hoverTextColor = sf::Color::White;
+	this->pressedTextColor = sf::Color::White;
 }
 
 void gui::Button::initShape(float x, float y, float width, float height)
@@ -30,30 +37,24 @@ void gui::Button::initText(sf::Font * font, std::string text)
 	this->font = font;
 	this->text.setFont(*this->font);
 	this->text.setString(text);
-	this->text.setFillColor(sf::Color::White);
-	this->text.setCharacterSize(14);
+	this->text.setFillColor(this->idleTextColor);
+	this->text.setCharacterSize(this->textSize);
 	this->text.setPosition(
-		(int)this->shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - this->text.getGlobalBounds().width / 2.f,
-		(int)this->shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - this->text.getGlobalBounds().height / 2.f - 3
+		(int)this->shape.getPosition().x + (int)(shape.getGlobalBounds().width / 2.f) - (int)(this->text.getGlobalBounds().width / 2.f),
+		(int)this->shape.getPosition().y + (int)(shape.getGlobalBounds().height / 2.f) - (int)(this->text.getGlobalBounds().height / 2.f) - 3
 	);
 }
 
 void gui::Button::initTexture(std::string textureLocationIdle, std::string textureLocationHover, std::string textureLocationPressed)
 {
 	if (!this->textureIdle.loadFromFile(textureLocationIdle))
-	{
 		throw("ERROR: Coudld not load image");
-	}
 
 	if (!this->textureHover.loadFromFile(textureLocationHover))
-	{
 		throw("ERROR: Coudld not load image");
-	}
 
 	if (!this->texturePressed.loadFromFile(textureLocationPressed))
-	{
 		throw("ERROR: Coudld not load image");
-	}
 }
 
 gui::Button::Button(float x, float y, std::string text, sf::Font * font)
@@ -80,7 +81,21 @@ gui::Button::Button(float x, float y, float width, float height, sf::Font * font
 	this->initText(font, text);
 }
 
-gui::Button::Button(float x, float y, std::string textureLocationIdle, std::string textureLocationHover, std::string textureLocationPressed)
+gui::Button::Button(float x, float y, float width, float height, sf::Font * font, std::string text,
+	unsigned int textSize, sf::Color idleTextColor, sf::Color hoverTextColor, sf::Color pressedTextColor, 
+	sf::Color idleColor, sf::Color hoverColor, sf::Color pressedColor, sf::Color outlineColor, float outlineThickness)
+{
+	this->initVariables(idleColor, hoverColor, pressedColor, outlineColor, outlineThickness);
+	this->textSize = textSize;
+	this->idleTextColor = idleTextColor;
+	this->hoverTextColor = hoverTextColor;
+	this->pressedTextColor = pressedTextColor;
+	this->initShape(x, y, width, height);
+	this->initText(font, text);
+}
+
+gui::Button::Button(float x, float y, sf::Color outlineColor, float outlineThickness, 
+	std::string textureLocationIdle, std::string textureLocationHover, std::string textureLocationPressed)
 {
 	this->isImage = true;
 	this->initTexture(textureLocationIdle, textureLocationHover, textureLocationPressed);
@@ -88,12 +103,44 @@ gui::Button::Button(float x, float y, std::string textureLocationIdle, std::stri
 	this->shape.setPosition(sf::Vector2f(x, y));
 	this->shape.setTexture(&this->textureIdle);
 	this->shape.setSize(sf::Vector2f((float)this->textureIdle.getSize().x, (float)this->textureIdle.getSize().y));
-	this->shape.setOutlineColor(sf::Color::Color(40,40,40,255));
-	this->shape.setOutlineThickness(3);
+	this->shape.setOutlineColor(outlineColor);
+	this->shape.setOutlineThickness(outlineThickness);
 }
 
 gui::Button::~Button()
 {
+}
+
+sf::Vector2f gui::Button::getPosition()
+{
+	return this->shape.getPosition();
+}
+
+sf::Color gui::Button::getIdleTextColor()
+{
+	return this->idleTextColor;
+}
+
+void gui::Button::setSize(float x, float y)
+{
+	this->shape.setSize(sf::Vector2f(x, y));
+}
+
+void gui::Button::setCharacterSize(unsigned int size)
+{
+	this->text.setCharacterSize(size);
+}
+
+void gui::Button::setText(std::string text)
+{
+	this->text.setString(text);
+}
+
+void gui::Button::setTextColor(sf::Color idle, sf::Color hover, sf::Color pressed)
+{
+	this->idleTextColor = idle;
+	this->hoverTextColor = hover;
+	this->pressedTextColor = pressed;
 }
 
 const bool gui::Button::isPressed()
@@ -115,6 +162,35 @@ int gui::Button::getButtonState()
 	return this->buttonState;
 }
 
+sf::Vector2f gui::Button::getSize()
+{
+	return this->shape.getSize();
+}
+
+
+void gui::Button::setPos(float x, float y)
+{
+	this->shape.setPosition(sf::Vector2f(x, y));
+}
+
+void gui::Button::setBackgroundColor(sf::Color idle, sf::Color hover, sf::Color pressed)
+{
+	this->idleColor = idle;
+	this->hoverColor = hover;
+	this->pressedColor = pressed;
+}
+
+void gui::Button::setOutlineColor(sf::Color color)
+{
+	this->shape.setOutlineColor(color);
+}
+
+void gui::Button::setOutlineThickness(float thickness)
+{
+	this->shape.setOutlineThickness(thickness);
+}
+
+// Called from event loop
 void gui::Button::updateEvent(sf::Event * ev, sf::Vector2f mousePosition)
 {
 	if (this->shape.getGlobalBounds().contains(mousePosition) && ev->mouseButton.button == sf::Mouse::Left)
@@ -123,8 +199,6 @@ void gui::Button::updateEvent(sf::Event * ev, sf::Vector2f mousePosition)
 
 void gui::Button::update(sf::Vector2f mousePosition)
 {	
-	this->buttonState = this->BUTTON_IDLE;
-
 	if (this->shape.getGlobalBounds().contains(mousePosition))
 	{
 		this->buttonState = this->BUTTON_HOVER;
@@ -138,33 +212,49 @@ void gui::Button::update(sf::Vector2f mousePosition)
 			this->isButtonReleased = false;
 		}	
 	}
+	else
+		this->buttonState = this->BUTTON_IDLE;
+
 
 	switch (buttonState)
 	{
 	case this->BUTTON_IDLE:
 		if (!this->isImage)
+		{
 			this->shape.setFillColor(this->idleColor);
+			this->text.setFillColor(this->idleTextColor);
+		}
+			
 		else
 			this->shape.setTexture(&this->textureIdle);
 		break;
 
 	case this->BUTTON_HOVER:
 		if (!this->isImage)
+		{
 			this->shape.setFillColor(this->hoverColor);
+			this->text.setFillColor(this->hoverTextColor);
+		}
 		else
 			this->shape.setTexture(&this->textureHover);
 		break;
 
 	case this->BUTTON_PRESSED:
 		if (!this->isImage)
+		{
 			this->shape.setFillColor(this->pressedColor);
+			this->text.setFillColor(this->pressedTextColor);
+		}
 		else
 			this->shape.setTexture(&this->texturePressed);
 		break;
 
 	default:
 		if (!this->isImage)
+		{
 			this->shape.setFillColor(this->idleColor);
+			this->text.setFillColor(this->idleTextColor);
+		}	
 		else
 			this->shape.setTexture(&this->textureIdle);
 		break;
@@ -181,6 +271,13 @@ void gui::Button::render(sf::RenderTarget * target)
 ********* LABEL ***********************************************************
 **************************************************************************/
 
+gui::Label::Label(sf::Font * font, std::string text)
+{
+	this->font = font;
+	this->text.setFont(*this->font);
+	this->text.setString(text);
+}
+
 gui::Label::Label(float x, float y, sf::Font * font, std::string text, int size, sf::Color color)
 {
 	this->font = font;
@@ -195,6 +292,31 @@ gui::Label::~Label()
 {
 }
 
+void gui::Label::setPosition(float x, float y)
+{
+	this->text.setPosition(x, y);
+}
+
+void gui::Label::setText(std::string text)
+{
+	this->text.setString(text);
+}
+
+void gui::Label::setTextColor(sf::Color color)
+{
+	this->text.setFillColor(color);
+}
+
+void gui::Label::setCharacterSize(unsigned int size)
+{
+	this->text.setCharacterSize(size);
+}
+
+sf::Vector2f gui::Label::getPos()
+{
+	return this->text.getPosition();
+}
+
 void gui::Label::render(sf::RenderTarget * target)
 {
 	target->draw(this->text);
@@ -203,7 +325,6 @@ void gui::Label::render(sf::RenderTarget * target)
 /**************************************************************************
 ********* TEXTBOX *********************************************************
 **************************************************************************/
-
 
 void gui::TextBox::initCursor()
 {
@@ -218,6 +339,20 @@ void gui::TextBox::initVariables()
 	this->isSelected = false;
 	this->width = 80;
 	this->height = 20;
+
+	this->outlineIdleThickness = 1;
+	this->outlineSelectedThickness = 2;
+
+	this->outlineIdleColor = sf::Color(34, 30, 31, 255);
+	this->outlineSelectedColor = sf::Color(0, 93, 233, 255);
+
+	this->idledColor = sf::Color(51, 51, 51, 255);
+	this->hoverColor = sf::Color(51, 51, 51, 255);
+	this->selectedColor = sf::Color(51, 51, 51, 255);
+
+	this->textIdleColor = sf::Color::White;
+	this->textHoverColor = sf::Color::White;
+	this->textSelectedColor = sf::Color::White;
 }
 
 void gui::TextBox::initShape(float x, float y)
@@ -251,15 +386,47 @@ gui::TextBox::TextBox(float x, float y, sf::Font * font, bool isInput)
 	this->initCursor();
 }
 
-gui::TextBox::TextBox(float x, float y, float width, sf::Font * font, bool isInput)
+gui::TextBox::TextBox(float x, float y, float width, float height, sf::Font * font, bool isInput)
 {
 	this->isInput = isInput;
 	this->initVariables();
 	this->width = width;
+	this->height = height;
 	this->initShape(x, y);
 	this->initText(font);
 	this->initCursor();
 }
+
+gui::TextBox::TextBox(float x, float y, float width, float height, sf::Font * font, bool isInput,
+	sf::Color tIdle, sf::Color tHover, sf::Color tSelected, 
+	sf::Color bIdle, sf::Color bHover, sf::Color bSelected, 
+	sf::Color oIdle, sf::Color oHover, sf::Color oSelected, 
+	float outlineIdleThickness, float outlineSelectedThickness)
+{
+	this->initVariables();
+	this->isInput = isInput;
+	this->width = width;
+	this->height = height;
+	this->initShape(x, y);
+	this->initText(font);
+	this->initCursor();
+
+	this->outlineIdleColor = oIdle;
+	this->outlineHoverColor = oHover;
+	this->outlineSelectedColor = oSelected;
+
+	this->idledColor = bIdle;
+	this->hoverColor = bHover;
+	this->selectedColor = bSelected;
+
+	this->textIdleColor = tIdle;
+	this->textHoverColor = tHover;
+	this->textSelectedColor = tSelected;
+
+	this->outlineIdleThickness = outlineIdleThickness;
+	this->outlineSelectedThickness = outlineSelectedThickness;
+}
+
 
 gui::TextBox::~TextBox()
 {
@@ -282,9 +449,61 @@ std::string gui::TextBox::getText()
 	return this->text.getString();
 }
 
+sf::Vector2f gui::TextBox::getPosition()
+{
+	return this->shape.getPosition();
+}
+
+sf::Vector2f gui::TextBox::getSize()
+{
+	return this->shape.getSize();
+}
+
 void gui::TextBox::setText(std::string text)
 {
+	this->s = text;
 	this->text.setString(text);
+}
+
+void gui::TextBox::setTextColor(sf::Color idle, sf::Color hover, sf::Color selected)
+{
+	this->textIdleColor = idle;
+	this->textHoverColor = hover;
+	this->textSelectedColor = selected;
+}
+
+void gui::TextBox::setBackgroundColor(sf::Color idle, sf::Color hover, sf::Color selected)
+{
+	this->idledColor = idle;
+	this->hoverColor = hover;
+	this->selectedColor = selected;
+}
+
+void gui::TextBox::setOutlineColor(sf::Color idle, sf::Color hover, sf::Color selected)
+{
+	this->outlineIdleColor = idle;
+	this->outlineHoverColor = hover;
+	this->outlineSelectedColor = selected;
+}
+
+void gui::TextBox::setOutlineThickness(float thickness)
+{
+	this->shape.setOutlineThickness(thickness);
+}
+
+void gui::TextBox::setPos(float x, float y)
+{
+	this->shape.setPosition(x, y);
+}
+
+void gui::TextBox::setSize(float x, float y)
+{
+	this->shape.setSize(sf::Vector2f(x, y));
+}
+
+void gui::TextBox::setCharacterSize(unsigned int size)
+{
+	this->text.setCharacterSize(size);
 }
 
 void gui::TextBox::updateCursor()
@@ -295,20 +514,45 @@ void gui::TextBox::updateCursor()
 	);
 }
 
+// Called from event loop, pollEvents() in Application
 void gui::TextBox::updateText(sf::Event* ev)
 {
 	if (this->isInput)
 	{
-		if (this->getSelected() && ev->text.unicode < 128 && ev->text.unicode > 2 
-			&& text.getGlobalBounds().width < this->width - 12 && ev->text.unicode != this->BACKSPACE_KEY
-			&& ev->text.unicode != this->ENTER_KEY && ev->text.unicode != this->TAB_KEY)
+		// Prints out pressed key as asci code
+		//if (this->getSelected())
+		//	std::cout << "key pressed code: " << ev->text.unicode << std::endl;
+		
+		// If textbox is selected and key pressed is accepted input, add text to textbox if it's lenght is not too large
+		if (this->getSelected() && ev->text.unicode < 128 && ev->text.unicode > 2 && text.getGlobalBounds().width < this->width - 12 
+			&& ev->text.unicode != this->BACKSPACE_KEY && ev->text.unicode != this->ENTER_KEY && ev->text.unicode != this->TAB_KEY 
+			&& ev->text.unicode != 22 && ev->text.unicode != 3) // ctrl + v = 22 | ctrl + c = 3
 		{
 			this->s += static_cast<char>(ev->text.unicode);
-		}
+		}// Delete key
 		else if (this->getSelected() && ev->text.unicode == this->BACKSPACE_KEY && s.size() != 0)
-		{
 			s.pop_back();
+
+		// Paste
+		if (this->getSelected() && ev->text.unicode == 22)
+		{
+			// Checks whether the length of the textbox would be exceeded
+			std::string clipboard = sf::Clipboard::getString();
+			std::string temp = this->s;
+
+			this->text.setString(temp += clipboard);
+
+			if (text.getGlobalBounds().width < this->width - 12)
+				this->s += clipboard;
+			else
+				std::cerr << "Error: Clipboard text length exceeded textbox length" << std::endl;
+			
+			this->text.setString(temp);
 		}
+
+		// Copy
+		if (this->getSelected() && ev->text.unicode == 3)
+			sf::Clipboard::setString(this->text.getString());
 
 		this->text.setString(this->s);
 	}
@@ -320,13 +564,26 @@ void gui::TextBox::update(sf::Vector2f mousePosition)
 	if (this->getSelected())
 	{
 		this->updateCursor();
-		this->shape.setOutlineThickness(2);
-		this->shape.setOutlineColor(sf::Color::Color(0, 93, 233, 255));
+		this->shape.setFillColor(this->selectedColor);
+		this->shape.setOutlineThickness(this->outlineSelectedThickness);
+		this->shape.setOutlineColor(this->outlineSelectedColor);
 	}
 	else
 	{
-		this->shape.setOutlineThickness(1);
-		this->shape.setOutlineColor(sf::Color::Color(34, 30, 31, 255));
+		if (this->textboxState == this->TEXTBOX_HOVER)
+		{
+			this->shape.setFillColor(this->hoverColor);
+			this->shape.setOutlineColor(this->outlineHoverColor);
+			this->shape.setOutlineThickness(this->outlineIdleThickness);
+			this->text.setFillColor(this->textHoverColor);
+		}
+		else
+		{
+			this->shape.setFillColor(this->idledColor);
+			this->shape.setOutlineColor(this->outlineIdleColor);
+			this->shape.setOutlineThickness(this->outlineIdleThickness);
+			this->text.setFillColor(this->textIdleColor);
+		}
 	}
 
 	this->textboxState = this->TEXTBOX_IDLE;
@@ -393,6 +650,26 @@ gui::Image::~Image()
 {
 }
 
+void gui::Image::setPosition(float x, float y)
+{
+	this->shape.setPosition(sf::Vector2f(x, y));
+}
+
+void gui::Image::setSize(float x, float y)
+{
+	this->shape.setSize(sf::Vector2f(x, y));
+}
+
+sf::Vector2f gui::Image::getPosition()
+{
+	return this->shape.getPosition();
+}
+
+sf::Vector2f gui::Image::getSize()
+{
+	return this->shape.getSize();
+}
+
 void gui::Image::render(sf::RenderTarget * target)
 {
 	target->draw(this->shape);
@@ -412,21 +689,20 @@ void gui::Graph::initVariables(float x, float y, float height, float width, floa
 	this->inputVectorX = inputVectorX;
 	this->inputVectorY = inputVectorY;
 	this->lineColor = sf::Color::Color::White;
+	this->pointsColor = sf::Color::Color::White;
 }
 
 
 void gui::Graph::initBackground(sf::Color color1, sf::Color color2)
 {
 	this->background.setSize(sf::Vector2f(this->width, this->height));
-	this->background.setOutlineThickness(1);
-	this->background.setOutlineColor(sf::Color(42, 42, 42, 255));
 	this->background.setFillColor(color1);
 	this->background.setPosition(sf::Vector2f(this->x, this->y));
 
 	this->background2.setSize(sf::Vector2f(this->width - 2 * this->margin, this->height - 2 * this->margin));
 	this->background2.setFillColor(color2);
 	this->background.setOutlineThickness(2);
-	this->background.setOutlineColor(sf::Color(46, 46, 46, 255));
+	this->background.setOutlineColor(sf::Color(38, 54, 64, 255));
 	this->background2.setPosition(sf::Vector2f(this->x + this->margin, this->y + this->margin));
 }
 
@@ -473,7 +749,7 @@ void gui::Graph::initGraph()
 	if (this->inputVectorX.size() == this->inputVectorY.size() && this->inputVectorX.size() != 0)
 	{
 		this->numberOfPoints = this->inputVectorX.size();
-		//this->spacing = (width - 2 * this->margin) / (this->numberOfPoints - 1);
+
 		//find min and max of input vectors
 		const auto minmaxX = std::minmax_element(this->inputVectorX.begin(), this->inputVectorX.end());
 		const auto minmaxY = std::minmax_element(this->inputVectorY.begin(), this->inputVectorY.end());
@@ -491,14 +767,14 @@ void gui::Graph::initGraph()
 			//populate vector
 			this->pointsPositions.push_back(sf::Vector2f(0, 0));
 			//normalize input vectors 0-100
-			this->inputVectorY[i] = ((this->inputVectorY[i] - this->minY) / (this->maxY - this->minY)) * 100;
-			this->inputVectorX[i] = ((this->inputVectorX[i] - this->minX) / (this->maxX - this->minX)) * 100;
-			//scale values. 100 being the maximum. top left is 0,0 so 1-(...) at Y to invert it
-			this->pointsPositions[i].y = ((1 - (this->inputVectorY[i] / 100))) * (this->height - 2 * this->margin) + this->y + this->margin;
-			this->pointsPositions[i].x = (this->inputVectorX[i] / 100) * (this->width - 2 * this->margin) + this->x + this->margin;
+			this->inputVectorY[i] = ((this->inputVectorY[i] - this->minY) / (this->maxY - this->minY));
+			this->inputVectorX[i] = ((this->inputVectorX[i] - this->minX) / (this->maxX - this->minX));
+			//scale values. 1 being the maximum. top left is 0,0 so 1-(...) at Y to invert it
+			this->pointsPositions[i].y = (1 - (this->inputVectorY[i])) * (this->height - 2 * this->margin) + this->y + this->margin;
+			this->pointsPositions[i].x = this->inputVectorX[i] * (this->width - 2 * this->margin) + this->x + this->margin;
 
-			this->points[i]->setPosition(sf::Vector2f(this->pointsPositions[i].x, this->pointsPositions[i].y));
-			this->points[i]->setRadius(3);
+			this->points[i]->setPosition(this->pointsPositions[i] /*sf::Vector2f(this->pointsPositions[i].x, this->pointsPositions[i].y)*/);
+			this->points[i]->setRadius(3.f);
 			//this->points[i]->setFillColor(sf::Color::Red);
 			this->points[i]->setFillColor(this->lineColor);
 			this->points[i]->setPointCount(50);
@@ -506,14 +782,86 @@ void gui::Graph::initGraph()
 			this->lines[i].color = this->lineColor;
 			this->lines[i].position = sf::Vector2f(this->pointsPositions[i].x + 2.f, this->pointsPositions[i].y + 2.f);
 		}
+
 	}
+}
+
+gui::Graph::Graph(sf::Font * font, std::string title, float x, float y, float width, float height, float margin)
+{
+	
+	this->isLoading = true;
+	this->x = x;
+	this->y = y;
+	this->height = height;
+	this->width = width;
+	this->margin = margin;
+	this->initBackground(sf::Color(36, 52, 62, 255), sf::Color(38, 54, 64, 255));
+	this->font = font;
+	this->initText(font, title);
+
+	this->loadingText.setFont(*this->font);
+	this->loadingText.setCharacterSize(18);
+	this->loadingText.setFillColor(sf::Color::White);
+	this->loadingText.setString("Loading...");
+	this->loadingText.setPosition(sf::Vector2f(
+		this->background.getPosition().x + (int)(this->background.getGlobalBounds().width / 2) - (int)this->loadingText.getGlobalBounds().width / 2 - 3,
+		this->background.getPosition().y + (int)(this->background.getGlobalBounds().height / 2) - (int)this->loadingText.getGlobalBounds().height / 2 - 3
+	));
+}
+
+gui::Graph::Graph(sf::Font * font, std::string title, std::vector<float> inputVectorY, float max, float min, float x, float y, float width, float height, float margin)
+{
+	this->x = x;
+	this->y = y;
+	this->height = height;
+	this->width = width;
+	this->margin = margin;
+	this->inputVectorY = inputVectorY;
+	this->lineColor = sf::Color::Color::White;
+	this->pointsColor = sf::Color::Color::White;
+
+	this->initBackground(sf::Color(36, 52, 62, 255), sf::Color(38, 54, 64, 255));
+
+	if (this->inputVectorY.size() != 0)
+	{
+		this->numberOfPoints = this->inputVectorY.size();
+		this->spacing = (width - 2 * this->margin) / (this->numberOfPoints - 1);
+		this->minY = min;
+		this->maxY = max;
+
+		//init lines 
+		this->lines = sf::VertexArray(sf::LineStrip, this->numberOfPoints);
+
+		for (int i = 0; i < this->numberOfPoints; i++)
+		{
+			// add new point
+			this->points.push_back(new sf::CircleShape);
+			// populate vector
+			this->pointsPositions.push_back(sf::Vector2f(0, 0));
+			// normalize input vectors 0-1
+			this->inputVectorY[i] = ((this->inputVectorY[i] - this->minY) / (this->maxY - this->minY));
+			// scale values. 1 being the maximum. top left is 0,0 so 1-(...) at Y to invert it
+			this->pointsPositions[i].y = ((1 - this->inputVectorY[i])) * (this->height - 2 * margin) + this->y + margin;
+			// equal distance from points at x axis
+			this->pointsPositions[i].x = this->spacing * i + this->x + this->margin;
+
+			this->points[i]->setPosition(this->pointsPositions[i]);
+			this->points[i]->setRadius(3.f);
+			this->points[i]->setFillColor(this->pointsColor);
+			this->points[i]->setPointCount(50);
+
+			this->lines[i].color = this->lineColor;
+			this->lines[i].position = sf::Vector2f(this->pointsPositions[i].x + 2.f, this->pointsPositions[i].y + 2.f);
+		}
+	}
+	this->initText(font, title);
 }
 
 gui::Graph::Graph(sf::Font * font, std::string title, std::vector<float> inputVectorX, std::vector<float> inputVectorY, float x, float y,
 				float width, float height, float margin)
 {
 	this->initVariables(x, y, height, width, margin, inputVectorX, inputVectorY);
-	this->initBackground(sf::Color(45, 45, 45, 255), sf::Color(48, 48, 48, 255));
+	this->initBackground(sf::Color(36, 52, 62, 255), sf::Color(38, 54, 64, 255));
 	this->initGraph();
 	this->initText(font, title);
 }
@@ -527,15 +875,46 @@ gui::Graph::~Graph()
 		delete text[i];
 }
 
-void gui::Graph::setColor(sf::Color color)
+const bool gui::Graph::getLoading()
 {
-	this->lineColor = color;
+	return this->isLoading;
+}
+
+sf::Vector2f gui::Graph::getPosition()
+{
+	return this->background.getPosition();
+}
+
+void gui::Graph::setPosition(float x, float y)
+{
+	this->background.setPosition(sf::Vector2f(x, y));
+}
+
+void gui::Graph::setLoading(bool value)
+{
+	this->isLoading = value;
+}
+
+void gui::Graph::setBackgroundColor(sf::Color background, sf::Color margin)
+{
+}
+
+void gui::Graph::setGraphColor(sf::Color line, sf::Color points)
+{
+	this->pointsColor = points;
+	this->lineColor = line;
 
 	for (int i = 0; i < this->numberOfPoints; i++)
 	{
-		this->points[i]->setFillColor(this->lineColor);
+		this->points[i]->setFillColor(this->pointsColor);
 		this->lines[i].color = this->lineColor;
 	}
+}
+
+void gui::Graph::setOutline(sf::Color outline, float thickness)
+{
+	this->background.setOutlineColor(outline);
+	this->background.setOutlineThickness(thickness);
 }
 
 void gui::Graph::clearGraph()
@@ -549,60 +928,46 @@ void gui::Graph::clearGraph()
 	this->inputVectorY.clear();
 }
 
-void gui::Graph::update(std::vector<float> inputVectorX, std::vector<float> inputVectorY, std::string title)
-{
-	this->clearGraph();
-	this->inputVectorX = inputVectorX;
-	this->inputVectorY = inputVectorY;
-	if (this->inputVectorX.size() == this->inputVectorY.size() && this->inputVectorX.size() != 0)
+void gui::Graph::updatePoints(float newPoint)
+{	
+	// Shift every value by 1 to the left
+	int j = 1;
+	for (unsigned int i = 0; i < this->inputVectorY.size() - 1; i++)
 	{
-		this->text[0]->setString(title);
-		this->numberOfPoints = this->inputVectorX.size();
-		const auto minmaxX = std::minmax_element(this->inputVectorX.begin(), this->inputVectorX.end());
-		const auto minmaxY = std::minmax_element(this->inputVectorY.begin(), this->inputVectorY.end());
-		this->minX = *minmaxX.first;
-		this->maxX = *minmaxX.second;
-		this->minY = *minmaxY.first;
-		this->maxY = *minmaxY.second;
-
-		this->text[1]->setString(std::to_string((int)this->minX));
-		this->text[2]->setString(std::to_string((int)this->maxX));
-		this->text[3]->setString(std::to_string((int)this->minY));
-		this->text[4]->setString(std::to_string((int)this->maxY));
-
-		this->lines = sf::VertexArray(sf::LineStrip, this->numberOfPoints);
-
-		for (int i = 0; i < this->numberOfPoints; i++)
-		{
-			//add new point
-			this->points.push_back(new sf::CircleShape);
-			//populate vector
-			this->pointsPositions.push_back(sf::Vector2f(0, 0));
-			//normalize input vectors 0-100
-			this->inputVectorY[i] = ((this->inputVectorY[i] - this->minY) / (this->maxY - this->minY)) * 100;
-			this->inputVectorX[i] = ((this->inputVectorX[i] - this->minX) / (this->maxX - this->minX)) * 100;
-			//scale values. 100 being the maximum. top left is 0,0 so 1-(...) at Y to invert it
-			this->pointsPositions[i].y = ((1 - (this->inputVectorY[i] / 100))) * (this->height - 2 * margin) + this->y + margin;
-			this->pointsPositions[i].x = (this->inputVectorX[i] / 100) * (this->width - 2 * margin) + this->x + margin;
-
-			this->points[i]->setPosition(sf::Vector2f(this->pointsPositions[i].x, this->pointsPositions[i].y));
-			this->points[i]->setRadius(3);
-			this->points[i]->setFillColor(this->lineColor);
-			this->points[i]->setPointCount(50);
-			this->lines[i].color = this->lineColor;
-			this->lines[i].position = sf::Vector2f(this->pointsPositions[i].x + 2.f, this->pointsPositions[i].y + 2.f);
-		}
+		this->inputVectorY[i] = this->inputVectorY[j];
+		j++;
 	}
-	else
-		this->text[0]->setString("ERROR: X,Y size mismatch or no input was given");
-		
+
+	// Normalize new value and replace last value of the input vector with this new value
+	this->inputVectorY[this->inputVectorY.size() - 1] = ((newPoint - this->minY) / (this->maxY - this->minY));
+
+	// Update points
+	for (int i = 0; i < this->numberOfPoints; i++)
+	{
+		// Scale values. 1 being the maximum. top left is 0,0 so 1-(...) at Y to invert it
+		this->pointsPositions[i].y = ((1 - this->inputVectorY[i])) * (this->height - 2 * this->margin) + this->y + this->margin;
+		// Equal distance from points at x axis
+		this->pointsPositions[i].x = this->spacing * i + this->x + this->margin;
+
+		this->points[i]->setPosition(this->pointsPositions[i]);
+		this->points[i]->setRadius(3.f);
+		this->points[i]->setFillColor(this->pointsColor);
+		this->points[i]->setPointCount(50);
+
+		this->lines[i].color = this->lineColor;
+		this->lines[i].position = sf::Vector2f(this->pointsPositions[i].x + 2.f, this->pointsPositions[i].y + 2.f);
+	}
 }
+
 
 void gui::Graph::render(sf::RenderTarget * target)
 {
 	target->draw(this->background);
 	target->draw(this->background2);
-		
+
+	if (this->isLoading)
+		target->draw(this->loadingText);
+
 	for (unsigned int i = 0; i < this->text.size(); i++)
 	{
 		target->draw(*this->text[i]);
@@ -613,7 +978,6 @@ void gui::Graph::render(sf::RenderTarget * target)
 		target->draw(*this->points[i]);
 		target->draw(lines);
 	}
-	
 }
 
 /**************************************************************************

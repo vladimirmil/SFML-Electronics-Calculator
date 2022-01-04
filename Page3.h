@@ -1,8 +1,16 @@
+/************************************************************************************
+ * @file Page3.h
+ *
+ * @brief Contents of page 3
+ *
+ * @author Vladimir Milivojevic
+ *
+ ************************************************************************************/
 #ifndef PAGE_3_H
 #define PAGE_3_H
 
 #include "Page.h"
-#include "PageMainMenu.h"
+#include "PageMain.h"
 
 class Page3 :
 	public Page
@@ -11,8 +19,6 @@ private:
 	sf::RectangleShape background;
 	std::map<std::string, gui::Button*> buttons;
 	std::map<std::string, gui::Label*> labels;
-	Footer* footer;
-	Titlebar* titlebar;
 
 	void initBackground(sf::RenderWindow* window);
 public:
@@ -21,7 +27,6 @@ public:
 	virtual ~Page3();
 
 	void updateInput();
-	void updateMouseMov();
 
 	void endState();
 	void initGUI();

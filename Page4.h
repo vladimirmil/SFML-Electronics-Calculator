@@ -1,8 +1,16 @@
+/************************************************************************************
+ * @file Page4.h
+ *
+ * @brief Contents of page 4
+ *
+ * @author Vladimir Milivojevic
+ *
+ ************************************************************************************/
 #ifndef PAGE_4_H
 #define PAGE_4_H
 
 #include "Page.h"
-#include "PageMainMenu.h"
+#include "PageMain.h"
 
 class Page4 :
 	public Page
@@ -10,17 +18,8 @@ class Page4 :
 private:
 	sf::RectangleShape background;
 	std::map<std::string, gui::Button*> buttons;
-	std::map<std::string, gui::TextBox*> textboxes;
 	std::map<std::string, gui::Label*> labels;
-	std::map<std::string, gui::Graph*> graphs;
-	std::map<std::string, gui::PopUp*> popups;
-	Footer* footer;
-	Titlebar* titlebar;
-	HandleInput handleinput;
-	std::vector<float> inputX, inputY;
-	std::string popuptext;
 
-	void initPopUpText();
 	void initBackground(sf::RenderWindow* window);
 public:
 
@@ -28,7 +27,6 @@ public:
 	virtual ~Page4();
 
 	void updateInput();
-	void updateMouseMov();
 
 	void endState();
 	void initGUI();

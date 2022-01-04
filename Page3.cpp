@@ -22,9 +22,6 @@ Page3::~Page3()
 
 	for (auto i = this->labels.begin(); i != this->labels.end(); i++)
 		delete i->second;
-
-	delete this->titlebar;
-	delete this->footer;
 }
 
 void Page3::updateInput()
@@ -33,37 +30,24 @@ void Page3::updateInput()
 		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
-void Page3::updateMouseMov()
-{
-	this->titlebar->updateWindowPosition(this->window);
-}
-
 void Page3::initGUI()
 {
-	this->titlebar = new Titlebar(this->window, &this->font, "Page 3");
-	this->footer = new Footer(this->window, &this->font);
-
 	this->buttons["BUTTON_BACK"] = new gui::Button(22.f, 45.f, "Back", &this->font);
 
-	this->labels["LABEL_EMPTY"] = new gui::Label(540.f, 320.f, &this->font, "Empty", 12, sf::Color::White);
+	this->labels["LABEL_EMPTY"] = new gui::Label(540.f, 320.f, &this->font, "Page 3", 12, sf::Color::White);
 }
 
 void Page3::updateGUI()
 {
-	this->titlebar->update(this->mousePositionView, this->window);
-
 	for (auto &i : this->buttons)
 		i.second->update(this->mousePositionView);
 
 	if (buttons["BUTTON_BACK"]->isReleased())
-		this->pages->push_front(new PageMainMenu(this->window, ev, pages));
+		this->pages->push_front(new PageMain(this->window, ev, pages));
 }
 
 void Page3::renderGUI(sf::RenderTarget * target)
 {
-	this->titlebar->render(target);
-	this->footer->render(target);
-
 	for (auto &i : this->buttons)
 		i.second->render(target);
 

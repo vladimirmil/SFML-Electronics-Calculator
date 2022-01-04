@@ -42,9 +42,6 @@ Page2::~Page2()
 
 	for (auto i = this->popups.begin(); i != this->popups.end(); i++)
 		delete i->second;
-
-	delete this->titlebar;
-	delete this->footer;
 }
 
 void Page2::calculate(calculate_state calculateState)
@@ -263,9 +260,6 @@ void Page2::endState()
 
 void Page2::initGUI()
 {
-	this->titlebar = new Titlebar(this->window, &this->font, "BJT level shift");
-	this->footer = new Footer(this->window, &this->font);
-
 	this->popups["POPUP_1"] = new gui::PopUp(&this->font, this->popup1text, 170.f, 150.f);
 	this->popups["POPUP_2"] = new gui::PopUp(&this->font, this->popup2text, 740.f, 150.f);
 
@@ -378,8 +372,6 @@ void Page2::initGUI()
 
 void Page2::updateGUI()
 {
-	this->titlebar->update(this->mousePositionView, this->window);
-
 	for (auto &i : this->buttons)
 		i.second->update(this->mousePositionView);
 
@@ -390,7 +382,7 @@ void Page2::updateGUI()
 		i.second->update(this->mousePositionView);
 
 	if (buttons["BUTTON_BACK"]->isReleased())
-		this->pages->push_front(new PageMainMenu(this->window, ev, pages));
+		this->pages->push_front(new PageMain(this->window, ev, pages));
 
 	if (buttons["BUTTON_CALC_1"]->isReleased())
 		this->calculate(this->CALC_STATE_1);
@@ -419,11 +411,6 @@ void Page2::updateInput()
 		i.second->updateEvent(this->ev, this->mousePositionView);
 }
 
-void Page2::updateMouseMov()
-{
-	this->titlebar->updateWindowPosition(this->window);
-}
-
 
 void Page2::update()
 {
@@ -434,9 +421,6 @@ void Page2::update()
 
 void Page2::renderGUI(sf::RenderTarget * target)
 {
-	this->titlebar->render(target);
-	this->footer->render(target);
-
 	for (auto &i : this->textboxes)
 		i.second->render(target);
 
