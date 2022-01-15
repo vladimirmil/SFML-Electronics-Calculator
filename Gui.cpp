@@ -519,44 +519,47 @@ void gui::TextBox::updateText(sf::Event* ev)
 {
 	if (this->isInput)
 	{
-		// Prints out pressed key as asci code
-		//if (this->getSelected())
-		//	std::cout << "key pressed code: " << ev->text.unicode << std::endl;
-		
-		// If textbox is selected and key pressed is accepted input, add text to textbox if it's lenght is not too large
-		if (this->getSelected() && ev->text.unicode < 128 && ev->text.unicode > 2 && text.getGlobalBounds().width < this->width - 12 
-			&& ev->text.unicode != this->BACKSPACE_KEY && ev->text.unicode != this->ENTER_KEY && ev->text.unicode != this->TAB_KEY 
-			&& ev->text.unicode != 22 && ev->text.unicode != 3) // ctrl + v = 22 | ctrl + c = 3
+		if (ev->type == sf::Event::TextEntered)
 		{
-			this->s += static_cast<char>(ev->text.unicode);
-		}// Delete key
-		else if (this->getSelected() && ev->text.unicode == this->BACKSPACE_KEY && s.size() != 0)
-			s.pop_back();
 
-		// Paste
-		if (this->getSelected() && ev->text.unicode == 22)
-		{
-			// Checks whether the length of the textbox would be exceeded
-			std::string clipboard = sf::Clipboard::getString();
-			std::string temp = this->s;
+			// Prints out pressed key as asci code
+			//if (this->getSelected())
+			//	std::cout << "key pressed code: " << ev->text.unicode << std::endl;
 
-			this->text.setString(temp += clipboard);
+			// If textbox is selected and key pressed is accepted input, add text to textbox if it's lenght is not too large
+			if (this->getSelected() && ev->text.unicode < 128 && ev->text.unicode > 2 && text.getGlobalBounds().width < this->width - 12
+				&& ev->text.unicode != this->BACKSPACE_KEY && ev->text.unicode != this->ENTER_KEY && ev->text.unicode != this->TAB_KEY
+				&& ev->text.unicode != 22 && ev->text.unicode != 3) // ctrl + v = 22 | ctrl + c = 3
+			{
+				this->s += static_cast<char>(ev->text.unicode);
+			}// Delete key
+			else if (this->getSelected() && ev->text.unicode == this->BACKSPACE_KEY && s.size() != 0)
+				s.pop_back();
 
-			if (text.getGlobalBounds().width < this->width - 12)
-				this->s += clipboard;
-			else
-				std::cerr << "Error: Clipboard text length exceeded textbox length" << std::endl;
-			
-			this->text.setString(temp);
+			// Paste
+			if (this->getSelected() && ev->text.unicode == 22)
+			{
+				// Checks whether the length of the textbox would be exceeded
+				std::string clipboard = sf::Clipboard::getString();
+				std::string temp = this->s;
+
+				this->text.setString(temp += clipboard);
+
+				if (text.getGlobalBounds().width < this->width - 12)
+					this->s += clipboard;
+				else
+					std::cerr << "Error: Clipboard text length exceeded textbox length" << std::endl;
+
+				this->text.setString(temp);
+			}
+
+			// Copy
+			if (this->getSelected() && ev->text.unicode == 3)
+				sf::Clipboard::setString(this->text.getString());
+
+			this->text.setString(this->s);
 		}
-
-		// Copy
-		if (this->getSelected() && ev->text.unicode == 3)
-			sf::Clipboard::setString(this->text.getString());
-
-		this->text.setString(this->s);
 	}
-	
 }
 
 void gui::TextBox::update(sf::Vector2f mousePosition)
